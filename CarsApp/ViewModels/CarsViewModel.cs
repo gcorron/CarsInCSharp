@@ -11,10 +11,9 @@ using System.Globalization;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
-using WpfApp5.Data;
 using System.Diagnostics;
 
-namespace WpfApp5.ViewModels
+namespace Corron.Cars.ViewModels
 {
     class CarsViewModel : Screen
     {
@@ -100,21 +99,19 @@ namespace WpfApp5.ViewModels
             if (MessageBox.Show("Do you want to Delete this car?", "Confirm",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                _fieldedCar.CarID = -_fieldedCar.CarID;
                 try
                 {
-                    DataAccess.UpdateCar(_fieldedCar as CarModel);
+                    if (DataAccess.DeleteCar(_fieldedCar.CarID))
+                    {
+                        _sortedCars.Remove(_fieldedCar);
+                        _sortedCars.Refresh();
+                    }
                 }
                 catch (Exception e)
                 {
                     MessageBox.Show(
                         $"Database Error: {e.Message}");
                     return;                
-                }
-                if (_fieldedCar.CarID == 0)
-                {
-                    _sortedCars.Remove(_fieldedCar);
-                    _sortedCars.Refresh();
                 }
             }
 
@@ -137,7 +134,7 @@ namespace WpfApp5.ViewModels
 
             bool isnew = _fieldedCar.CarID == 0;
 
-            DataAccess.UpdateCar(_fieldedCar);
+            DataAccess.UpdateCar(_fieldedCar as CarModel);
             if (isnew)
             { 
                 _sortedCars.CommitNew();

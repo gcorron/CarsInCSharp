@@ -1,13 +1,14 @@
 ﻿using Caliburn.Micro;
+using Corron.Cars.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using WpfApp5.ViewModels;
 
-namespace WpfApp5
+
+namespace Corron.Cars
 {
     class Bootstrapper:BootstrapperBase
     {
@@ -17,7 +18,7 @@ namespace WpfApp5
         }
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
-            DisplayRootViewFor<ShellViewModel>();
+            DisplayRootViewFor<ViewModels.ShellViewModel>();
         }
     }
 }

@@ -68,7 +68,7 @@ namespace Corron.CarService
             }
         }
 
-        public static bool UpdateCar(ICarModel car)
+        public static bool UpdateCar(CarModel car)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace Corron.CarService
             return true;
         }
 
-        public static bool UpdateService(IServiceModel service)
+        public static bool UpdateService(ServiceModel service)
         {
             try
             {
@@ -135,10 +135,8 @@ namespace Corron.CarService
             {
                 using (IDbConnection connection = GetJoesDBConnection())
                 {
-                    List<int> results;
-                    results = connection.Query<int>("dbo.UpdateCar @CarID, @Make, @Model, @Year, @Owner", new CarModel { CarID = -id }) as List<int>;
-
-                    return (results[0] == 0);
+                    connection.Execute($"dbo.DeleteCar @CarID={id}");
+                    return true;
                 }
             }
             catch (Exception e)
@@ -154,10 +152,8 @@ namespace Corron.CarService
             {
                 using (IDbConnection connection = GetJoesDBConnection())
                 {
-                    List<int> results;
-                    results = connection.Query<int>("dbo.UpdateService @ServiceID, @ServiceDate, @TechName, @LaborCost, @PartsCost, @CarID", new ServiceModel { ServiceID = -id }) as List<int>;
-
-                    return (results[0] == 0);
+                    connection.Execute($"dbo.DeleteService @ServiceID={id}");
+                    return true;
                 }
             }
             catch (Exception e)

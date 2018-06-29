@@ -492,14 +492,14 @@
             </summary>
             <returns>List(of CarModel)</returns>
         </member>
-        <member name="M:CarsAPI.Controllers.CarsController.Post(Corron.CarService.ICarModel)">
+        <member name="M:CarsAPI.Controllers.CarsController.Post(Corron.CarService.CarModel)">
             <summary>
             add new car object. expects carID to be 0, returns new carID
             </summary>
             <param name="car"></param>
             <returns>new CarID</returns>
         </member>
-        <member name="M:CarsAPI.Controllers.CarsController.Put(System.Int32,Corron.CarService.ICarModel)">
+        <member name="M:CarsAPI.Controllers.CarsController.Put(System.Int32,Corron.CarService.CarModel)">
             <summary>
             update car object
             negative id is for delete
@@ -527,14 +527,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:CarsAPI.Controllers.ServicesController.Post(Corron.CarService.IServiceModel)">
+        <member name="M:CarsAPI.Controllers.ServicesController.Post(Corron.CarService.ServiceModel)">
             <summary>
             add a new service object
             </summary>
             <param name="service"></param>
             <returns>new ServiceID</returns>
         </member>
-        <member name="M:CarsAPI.Controllers.ServicesController.Put(System.Int32,Corron.CarService.IServiceModel)">
+        <member name="M:CarsAPI.Controllers.ServicesController.Put(System.Int32,Corron.CarService.ServiceModel)">
             <summary>
             update service object
             </summary>

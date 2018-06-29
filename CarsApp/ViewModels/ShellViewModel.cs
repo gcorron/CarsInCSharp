@@ -7,9 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Corron.CarService;
-using WpfApp5.Data;
 
-namespace WpfApp5.ViewModels
+namespace Corron.Cars.ViewModels
 {
     class ShellViewModel : Conductor<IScreen>.Collection.OneActive
     {

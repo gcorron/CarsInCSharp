@@ -31,7 +31,7 @@ namespace CarsAPI.Controllers
         /// </summary>
         /// <param name="car"></param>
         /// <returns>new CarID</returns>
-        public int Post([FromBody]ICarModel car) 
+        public int Post([FromBody]CarModel car) 
         {
             SQLData.UpdateCar(car);
             return car.CarID;
@@ -44,7 +44,7 @@ namespace CarsAPI.Controllers
         /// <param name="id"></param>
         /// <param name="car"></param>
         /// <returns>CarID</returns>
-        public int Put(int id, [FromBody]ICarModel car)
+        public int Put(int id, [FromBody]CarModel car)
         {
             SQLData.UpdateCar(car);
             return car.CarID;

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WpfApp5.Properties
+namespace Corron.Cars.Properties
 {
 
 

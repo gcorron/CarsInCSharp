@@ -7,7 +7,7 @@ using Corron.CarService;
 using System.Data;
 using System.Configuration;
 
-namespace WpfApp5.Data
+namespace Corron.Cars
 {
     public static class DataAccess
     {
@@ -47,7 +47,7 @@ namespace WpfApp5.Data
                 return WebClient.GetServices(CarID);
         }
 
-        public static bool UpdateCar(ICarModel car)
+        public static bool UpdateCar(CarModel car)
         {
             if (_useSQL)
                 return SQLData.UpdateCar(car);
@@ -57,7 +57,7 @@ namespace WpfApp5.Data
             }
         }
 
-        public static bool UpdateService(IServiceModel service)
+        public static bool UpdateService(ServiceModel service)
         {
             if (_useSQL)
                 return SQLData.UpdateService(service);
@@ -65,5 +65,24 @@ namespace WpfApp5.Data
                 return WebClient.UpdateService(service);
         }
 
-     }
+        public static bool DeleteCar(int id)
+        {
+            if (_useSQL)
+                return SQLData.DeleteCar(id);
+            else
+            {
+                return WebClient.DeleteCar(id);
+            }
+        }
+
+        public static bool DeleteService(int id)
+        {
+            if (_useSQL)
+                return SQLData.DeleteService(id);
+            else
+                return WebClient.DeleteService(id);
+        }
+
+
+    }
 }

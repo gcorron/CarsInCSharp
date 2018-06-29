@@ -28,9 +28,10 @@ namespace CarsAPI
             var resp = new HttpResponseMessage(HttpStatusCode.NotFound)
             {
                 Content = new StringContent(Message),
-                ReasonPhrase = "Database Error"
+                ReasonPhrase = "Database error"
             };
             throw new HttpResponseException(resp);
+
         }
     }
 }

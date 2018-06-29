@@ -9,9 +9,8 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using Corron.CarService;
-using WpfApp5.Data;
 
-namespace WpfApp5.ViewModels
+namespace Corron.Cars.ViewModels
 {
     class ServicesViewModel:Screen
     {
@@ -65,8 +64,6 @@ namespace WpfApp5.ViewModels
 
         #endregion
 
-
- 
         // Objects
 
         public BindingListCollectionView SortedServices
@@ -174,8 +171,7 @@ namespace WpfApp5.ViewModels
             if (MessageBox.Show("Do you want to Delete this service?", "Confirm",
                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                _fieldedService.ServiceID = -_fieldedService.ServiceID;
-                if (DataAccess.UpdateService(_fieldedService))
+                if (DataAccess.DeleteService(_fieldedService.ServiceID))
                 {
                     _sortedServices.Remove(_fieldedService);
                     _sortedServices.Refresh();

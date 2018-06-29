@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Formatting;
 using Corron.CarService;
 
-namespace WpfApp5.Data
+namespace Corron.Cars
 {
     public static class WebClient
     {
@@ -31,6 +31,9 @@ namespace WpfApp5.Data
             }
         }
 
+
+        //CarModel CRUD
+
         public static List<CarModel> GetCars()
         {
             try
@@ -39,10 +42,7 @@ namespace WpfApp5.Data
             }
             catch (Exception e)
             {
-                if (e.InnerException is null)
-                    _handleError(e.Message);
-                else
-                    _handleError(e.InnerException.Message);
+                ReportException(e);
                 return null;
             }
         }
@@ -51,9 +51,16 @@ namespace WpfApp5.Data
         {
             using (var response = await _client.GetAsync("api/Cars", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                var reader = await response.Content.ReadAsAsync<List<CarModel>>().ConfigureAwait(false);
-                return reader.ToList<CarModel>();
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var reader = await response.Content.ReadAsAsync<List<CarModel>>().ConfigureAwait(false);
+                    return reader.ToList<CarModel>();
+                }
+                else
+                {
+                    ThrowSQLError(response, "Get Cars");
+                    return null;
+                }
             }
         }
 
@@ -65,10 +72,7 @@ namespace WpfApp5.Data
             }
             catch (Exception e)
             {
-                if (e.InnerException is null)
-                    _handleError(e.Message);
-                else
-                    _handleError(e.InnerException.Message);
+                ReportException(e);
                 return null;
             }
         }
@@ -77,20 +81,24 @@ namespace WpfApp5.Data
         {
             using (var response = await _client.GetAsync($"api/Services?id={CarID}", HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                var reader = await response.Content.ReadAsAsync<List<ServiceModel>>().ConfigureAwait(false);
-                return reader.ToList<ServiceModel>();
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var reader = await response.Content.ReadAsAsync<List<ServiceModel>>().ConfigureAwait(false);
+                    return reader.ToList<ServiceModel>();
+                }
+                else
+                {
+                    ThrowSQLError(response, "Get Cars");
+                    return null;
+                }
             }
         }
-        public static bool UpdateCar(ICarModel car)
+        public static bool UpdateCar(CarModel car)
         {
             try
             {
                 switch(car.CarID.CompareTo(0))
                 {
-                    case -1:
-                        car.CarID = DeleteCarTask(car.CarID).GetAwaiter().GetResult();
-                        break;
                     case 0:
                         car.CarID = PostCarTask(car).GetAwaiter().GetResult();
                         break;
@@ -101,31 +109,56 @@ namespace WpfApp5.Data
             }
             catch (Exception e)
             {
-                if (e.InnerException is null)
-                    _handleError(e.Message);
-                else
-                    _handleError(e.InnerException.Message);
+                ReportException(e);
                 return false;
             }
             return true;
         }
-        public static async Task<int> PutCarTask(ICarModel car)
+
+        public static bool DeleteCar(int id)
         {
-            using (var response = await _client.PutAsJsonAsync<ICarModel>($"api/Cars?id={car.CarID}",car).ConfigureAwait(false))
+            try
             {
-                response.EnsureSuccessStatusCode();
-              int id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
-              return id;
+                return (DeleteCarTask(id).GetAwaiter().GetResult()==0);
+            }
+            catch (Exception e)
+            {
+                ReportException(e);
+                return false;
             }
         }
 
-        public static async Task<int> PostCarTask(ICarModel car)
+        public static async Task<int> PutCarTask(CarModel car)
         {
-            using (var response = await _client.PostAsJsonAsync<ICarModel>($"api/Cars?id={car.CarID}", car).ConfigureAwait(false))
+            using (var response = await _client.PutAsJsonAsync<CarModel>($"api/Cars?id={car.CarID}",car).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                int id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
-                return id;
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    int id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
+                    return id;
+                }
+                else
+                {
+                    ThrowSQLError(response, "Put Car");
+                    return 0;
+                }
+            }
+        }
+
+        public static async Task<int> PostCarTask(CarModel car)
+        {
+            using (var response = await _client.PostAsJsonAsync<CarModel>($"api/Cars?id={car.CarID}", car).ConfigureAwait(false))
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    int id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
+                    return id;
+                }
+                else
+                {
+                    ThrowSQLError(response, "Post Car");
+                    return 0;
+                }
             }
         }
 
@@ -133,23 +166,30 @@ namespace WpfApp5.Data
         {
             using (var response = await _client.DeleteAsync($"api/Cars?id={id}").ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
-                return id;
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
+                    return id;
+                }
+                else
+                {
+                    ThrowSQLError(response, "Delete Car");
+                    return 0;
+                }
             }
+
         }
 
 
+        // Service Model CRUD
 
-        public static bool UpdateService(IServiceModel service)
+        public static bool UpdateService(ServiceModel service)
         {
             try
             {
                 switch (service.ServiceID.CompareTo(0))
                 {
-                    case -1:
-                        service.ServiceID = DeleteServiceTask(service.ServiceID).GetAwaiter().GetResult();
-                        break;
                     case 0:
                         service.ServiceID = PostServiceTask(service).GetAwaiter().GetResult();
                         break;
@@ -160,31 +200,56 @@ namespace WpfApp5.Data
             }
             catch (Exception e)
             {
-                if (e.InnerException is null)
-                    _handleError(e.Message);
-                else
-                    _handleError(e.InnerException.Message);
+                ReportException(e);
                 return false;
             }
             return true;
         }
-        public static async Task<int> PutServiceTask(IServiceModel service)
+
+        public static bool DeleteService(int id)
         {
-            using (var response = await _client.PutAsJsonAsync<IServiceModel>($"api/Services?id={service.ServiceID}", service).ConfigureAwait(false))
+            try
+            { 
+                return (DeleteServiceTask(id).GetAwaiter().GetResult() == 0);
+            }
+            catch (Exception e)
             {
-                response.EnsureSuccessStatusCode();
-                int id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
-                return id;
+                ReportException(e);
+                return false;
             }
         }
 
-        public static async Task<int> PostServiceTask(IServiceModel service)
+        public static async Task<int> PutServiceTask(ServiceModel service)
         {
-            using (var response = await _client.PostAsJsonAsync<IServiceModel>($"api/Services?id={service.CarID}", service).ConfigureAwait(false))
+            using (var response = await _client.PutAsJsonAsync<ServiceModel>($"api/Services?id={service.ServiceID}", service).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                int id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
-                return id;
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    int id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
+                    return id;
+                }
+                else
+                {
+                    ThrowSQLError(response, "Put Service");
+                    return 0;
+                }
+            }
+        }
+
+        public static async Task<int> PostServiceTask(ServiceModel service)
+        {
+            using (var response = await _client.PostAsJsonAsync<ServiceModel>($"api/Services?id={service.CarID}", service).ConfigureAwait(false))
+            {
+                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    int id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
+                    return id;
+                }
+                else
+                {
+                    ThrowSQLError(response, "Post Service");
+                    return 0;
+                }
             }
         }
 
@@ -192,12 +257,37 @@ namespace WpfApp5.Data
         {
             using (var response = await _client.DeleteAsync($"api/Services?id={id}").ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
-                return id;
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    id = await response.Content.ReadAsAsync<int>().ConfigureAwait(false);
+                    return id;
+                }
+                else
+                {
+                    ThrowSQLError(response,"Delete Service");
+                    return 0;
+                }
             }
         }
+        
+        private static void ThrowSQLError(HttpResponseMessage response, string operation)
+        {
+            string details = GetErrorDetailsFromResponse(response).GetAwaiter().GetResult();
+            throw new Exception($"{operation} failed because: {response.ReasonPhrase}: {response.Content}");
+        }
 
+        private static async Task<string> GetErrorDetailsFromResponse(HttpResponseMessage response)
+        {
+            return await response.Content.ReadAsAsync<string>().ConfigureAwait(false);
+        }
+
+        private static void ReportException(Exception e)
+        {
+            if (e.InnerException is null)
+                _handleError(e.Message);
+            else
+                _handleError(e.InnerException.Message);
+        }
 
     }
 }

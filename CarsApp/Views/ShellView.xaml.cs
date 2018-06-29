@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Caliburn.Micro;
 
-namespace WpfApp5.Views
+namespace Corron.Cars.Views
 {
     /// <summary>
     /// Interaction logic for ShellView.xaml

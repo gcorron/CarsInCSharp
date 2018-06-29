@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace WpfApp5
+namespace Corron.Cars
 {
     /// <summary>
     /// Interaction logic for App.xaml
