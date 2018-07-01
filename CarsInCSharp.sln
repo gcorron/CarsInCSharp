@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "CarsApp\App.csproj",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corron.CarServiceLibrary", "Corron.CarService\Corron.CarServiceLibrary.csproj", "{9255E17F-82CB-40B9-94D1-D832EC68EC74}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarsSetup", "CarsSetup\CarsSetup.vdproj", "{D4274994-226B-4D12-BAC9-4627061D3877}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "JoesCarService", "JoesCarService\JoesCarService.sqlproj", "{B6C86DFB-DF67-4517-BCAA-B6F4CFDE0AC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{9255E17F-82CB-40B9-94D1-D832EC68EC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9255E17F-82CB-40B9-94D1-D832EC68EC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9255E17F-82CB-40B9-94D1-D832EC68EC74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4274994-226B-4D12-BAC9-4627061D3877}.Debug|Any CPU.ActiveCfg = Debug
+		{D4274994-226B-4D12-BAC9-4627061D3877}.Release|Any CPU.ActiveCfg = Release
+		{B6C86DFB-DF67-4517-BCAA-B6F4CFDE0AC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6C86DFB-DF67-4517-BCAA-B6F4CFDE0AC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6C86DFB-DF67-4517-BCAA-B6F4CFDE0AC8}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{B6C86DFB-DF67-4517-BCAA-B6F4CFDE0AC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6C86DFB-DF67-4517-BCAA-B6F4CFDE0AC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6C86DFB-DF67-4517-BCAA-B6F4CFDE0AC8}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -53,12 +53,13 @@ namespace Corron.Cars.ViewModels
 
             _sortedServices = new BindingListCollectionView(_services);
             _sortedServices.MoveCurrentToFirst();
-            _fieldedService = _sortedServices.CurrentItem as ServiceModel;
+            FieldedService = _sortedServices.CurrentItem as ServiceModel;
 
 
             NotifyOfPropertyChange(() => SortedServices);
             NotifyOfPropertyChange(() => CanDelete);
-
+           // NotifyOfPropertyChange(() => FieldedService);
+           // NotifyOfPropertyChange(() => ServiceLines);
             return true;
         }
 
@@ -79,8 +80,7 @@ namespace Corron.Cars.ViewModels
                 _fieldedService = value;
                 _cvServiceLines = null; //force refresh of bindings for detail lines
                 NotifyOfPropertyChange();
-                if (!(ServiceLines is null))
-                    NotifyOfPropertyChange(() => ServiceLines); 
+                NotifyOfPropertyChange(() => ServiceLines);  
             }
         }
 
