@@ -8,7 +8,8 @@ CREATE PROCEDURE [dbo].[SelectServices] (@begindate smalldatetime)
 AS
 BEGIN
 
-	select * from service a
+	select [a].[ServiceID], [a].[ServiceDate], [a].[TechName], [a].[LaborCost], [a].[PartsCost], [a].[CarID]
+		, [b].[ServiceID], [b].[ServiceLineOrder], [b].[ServiceLineType], [b].[ServiceLineDesc], [b].[ServiceLineCharge] from service a
 		left outer join ServiceLine b
 		on a.ServiceID=b.ServiceID
 

@@ -16,7 +16,7 @@ BEGIN
 		select SCOPE_IDENTITY() as ret
 	end
 
-	update service
+	update Service
 		set ServiceDate=@ServiceDate,
 			TechName=@TechName,
 			LaborCost=@LaborCost,

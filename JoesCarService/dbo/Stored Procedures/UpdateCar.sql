@@ -12,7 +12,7 @@ BEGIN
 	if @carID=0 begin -- pass 0 in ID means insert
 		insert car (make,model,[year],owner) values (@make, @model, @year, @owner)
 		-- Insert statements for procedure here
-		select @@identity as ret
+		select SCOPE_IDENTITY() as ret
 	end
 
 	update car -- pass positive in ID means update
