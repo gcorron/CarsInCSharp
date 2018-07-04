@@ -96,18 +96,27 @@ namespace Corron.CarService
         private string _serviceLineDesc;
 
         [DataMember]
-        public decimal ServiceLineCharge
+        public decimal ServiceLineCharge { get; set; }
+
+        public string ServiceLineChargeString
         {
-            get { return _serviceLineCharge; }
-            set
-            {
-                _serviceLineCharge = value;
-                Validation.ValidateCost(value);
+            get {
+                if (_serviceLineChargeString is null)
+                    _serviceLineChargeString=String.Format(MONEY_FORMAT,ServiceLineCharge);
+                return _serviceLineChargeString;
+            }
+            set {
+                decimal charge;
+                _serviceLineChargeString = value;
+                if (Validation.ValidateCostString(value, out charge) == null)
+                {
+                    ServiceLineCharge = charge;
+                    DoRecalc();
+                }
                 NotifyIfValidChanged();
-                DoRecalc();
             }
         }
-        private decimal _serviceLineCharge;
+        private string _serviceLineChargeString;
 
         public bool Delete {
             get
@@ -118,7 +127,7 @@ namespace Corron.CarService
             {
                 _delete = value;
                 DoRecalc();
-                //NotifyOfPropertyChange();
+                ValidChangedAction();
             }
         }
         private bool _delete;
@@ -129,7 +138,9 @@ namespace Corron.CarService
         {
             get
             {
-                return (new string[] { "ServiceLineDesc", "ServiceLineCharge" }.All(s => (this[s] is null)));
+                if (Delete)
+                    return true;
+                return (new string[] { "ServiceLineDesc", "ServiceLineChargeString" }.All(s => (this[s] is null)));
             }
         }
 
@@ -155,7 +166,6 @@ namespace Corron.CarService
             RecalcAction();
         }
 
-      
         // Implements IDataErrorInfo
         public string Error
         {
@@ -173,7 +183,7 @@ namespace Corron.CarService
                 switch (columnName)
                 {
                     case "ServiceLineDesc": return Validation.FiftyNoBlanks(ServiceLineDesc);
-                    case "ServiceLineCharge": return Validation.ValidateCost(ServiceLineCharge);
+                    case "ServiceLineChargeString": return Validation.ValidateCostString(ServiceLineChargeString,out decimal junk);
                     default:
                         return "Invalid Column Name";
                 }

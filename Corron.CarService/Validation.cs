@@ -17,7 +17,7 @@ namespace Corron.CarService
 
             int i = cost.IndexOf('.');
             if (i < 0)
-                return ValidateCost(dcost);
+                return "Missing decimal";
 
             if (i == cost.Length - 3)
                 return ValidateCost(dcost);

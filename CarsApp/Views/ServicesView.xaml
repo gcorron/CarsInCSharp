@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
+             xmlns:extToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" Background="Bisque" FontSize="16" 
              d:DesignHeight="400" d:DesignWidth="800"
              Width="Auto" Height="Auto">
@@ -190,46 +191,45 @@
                                         IsTextSearchEnabled="True" TextSearch.TextPath="Name"
                                         FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"/>
                             </DataTemplate>
-                        </DataGrid.Resources>
+                            
+                        <DataTemplate x:Key="LineDescDisplay">
+                            <TextBlock Text="{Binding Path=ServiceLineDesc, TargetNullValue=Enter Description,
+                                            Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="LineDescEdit">
+                            <extToolkit:WatermarkTextBox Watermark="Enter Description"
+                                Text="{Binding Path=ServiceLineDesc,  TargetNullValue=Enter Description,
+                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+                        </DataTemplate>
+
+                    </DataGrid.Resources>
                         <DataGrid.Columns>
                             <!-- Column: ServiceLineType -->
                             <DataGridTemplateColumn Header="Type" Width="2*"
                                  CellTemplate="{StaticResource LineTypeDisplay}" CellEditingTemplate="{StaticResource LineTypeSelect}"/>
-     <!-- Column: ServiceLineDesc -->
-                            <DataGridTextColumn Width="5*">
-                                <DataGridTextColumn.Header>
-                                    <TextBlock >Description</TextBlock>
-                                </DataGridTextColumn.Header>
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource CellStyleError}">
-                                        <Setter Property="Text" Value="{Binding Path=ServiceLineDesc, 
-                                            Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                                <DataGridTextColumn.EditingElementStyle>
-                                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource EditCellStyleError}">
-                                        <Setter Property="Text" Value="{Binding Path=ServiceLineDesc, 
-                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
-                                    </Style>
-                                </DataGridTextColumn.EditingElementStyle>
+                             <!-- Column: ServiceLineDesc -->
+                            <DataGridTemplateColumn Header="Description" Width="5*"
+                                 CellTemplate="{StaticResource LineDescDisplay}" CellEditingTemplate="{StaticResource LineDescEdit}"/>
 
-                            </DataGridTextColumn>
-     <!-- Column: ServiceLineCharge -->
+                            <!-- Column: ServiceLineCharge -->
                             <DataGridTextColumn Width="3*">
                                 <DataGridTextColumn.Header>
                                     <TextBlock HorizontalAlignment="Right">Charge</TextBlock>
                                 </DataGridTextColumn.Header>
                                 <DataGridTextColumn.ElementStyle>
                                     <Style  TargetType="{x:Type TextBlock}"  BasedOn="{StaticResource CellStyleError}">
-                                        <Setter Property="HorizontalAlignment" Value="Right" />
-                                        <Setter Property="Text" Value="{Binding Path=ServiceLineCharge, StringFormat='0.00', 
-                                Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    <Setter Property="TextAlignment" Value="Right"/>
+                                    <Setter Property="Text" Value="{Binding Path=ServiceLineChargeString, 
+                                        Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                                 <DataGridTextColumn.EditingElementStyle>
                                     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource EditCellStyleError}">
-                                        <Setter Property="HorizontalAlignment" Value="Right"/>
-                                        <Setter Property="Text" Value="{Binding Path=ServiceLineCharge, StringFormat='0.00',
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                                        <Setter Property="Text" Value="{Binding Path=ServiceLineChargeString,
                                 Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
                                     </Style>
                                 </DataGridTextColumn.EditingElementStyle>

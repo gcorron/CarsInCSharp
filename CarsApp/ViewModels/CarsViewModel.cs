@@ -58,6 +58,8 @@ namespace Corron.Cars.ViewModels
         }
         private ICarModel _fieldedCar;
 
+        private ICarModel LastFieldedCar { get; set; }
+
         public bool CanSave(string Fieldedcar_Make, string Fieldedcar_Model, string Fieldedcar_Owner, int Fieldedcar_Year)
         {
             if (String.IsNullOrWhiteSpace(Fieldedcar_Make)) return false;
@@ -124,8 +126,8 @@ namespace Corron.Cars.ViewModels
 
         public void Add()
         {
+            LastFieldedCar = FieldedCar;
             FieldedCar = _sortedCars.AddNew() as ICarModel;
-            _listBookMark = _sortedCars.CurrentPosition;
             ScreenEditingMode = true;
         }
 
@@ -153,18 +155,15 @@ namespace Corron.Cars.ViewModels
         public void Cancel()
         {
             if (_sortedCars.IsAddingNew)
+            {
                 _sortedCars.CancelNew();
+                FieldedCar=LastFieldedCar;
+            }
             else if (_sortedCars.IsEditingItem)
                 _sortedCars.CancelEdit();
             ScreenEditingMode = false;
 
-            if (_listBookMark >= 0)
-            {
-                if (!_sortedCars.MoveCurrentToPosition(_listBookMark))
-                    return;
-                FieldedCar = _sortedCars.CurrentItem as ICarModel;
-            }
-        }
+         }
 
         private void _cars_ListChanged(object sender, ListChangedEventArgs e)
         {

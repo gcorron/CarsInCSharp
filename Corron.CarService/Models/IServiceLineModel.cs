@@ -9,6 +9,7 @@ namespace Corron.CarService
         string ServiceLineTypeString { get; }
         string ServiceLineDesc { get; set; }
         decimal ServiceLineCharge { get; set; }
+        string ServiceLineChargeString { get; set; }
         bool Delete { get; set; }
 
 //for database access only

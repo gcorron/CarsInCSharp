@@ -39,7 +39,7 @@ namespace Corron.CarService
         }
 
         // delegate initialization
-        public static void PassDelegate(RollBackNotifyDelegate rb)
+        public static void PassRollBackDelegate(RollBackNotifyDelegate rb)
         {
             RollBackNotifyAction = rb;
         }
@@ -138,9 +138,19 @@ namespace Corron.CarService
             {
                 if (ServiceLineList is null)
                     return false;
-                if (ServiceLineList.Count == 0)
-                    return false;
-                return ServiceLineList.All(s => s.IsValidState);
+
+                bool atLeastOne=false;
+                foreach (var s in ServiceLineList)
+                {
+                    if (!s.Delete)
+                    { 
+                        if (s.IsValidState)
+                            atLeastOne = true;
+                        else
+                            return false;
+                    }
+                }
+                return atLeastOne;
             }
         }
 
@@ -221,8 +231,7 @@ namespace Corron.CarService
 
         public void CancelEdit()
         {
-            ServiceLineModel.NullDelegates();
-
+            ServiceLineModel.NullDelegates(); //eliminate references to parent ServiceModel methods
             ObjectCopier.CopyFields(this, _editCopy);
             _editCopy = null;
             _serviceLineList = ObjectCopier.CopyList<ServiceLineModel>(_editServiceLines);

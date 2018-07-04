@@ -32,7 +32,7 @@ namespace Corron.Cars.ViewModels
         //Load Data, always call on activation!
         public bool LoadServiceData(ICarModel car)
         {
-            ServiceModel.PassDelegate(ChangesRolledBack);
+            ServiceModel.PassRollBackDelegate(ChangesRolledBack);
 
             _car = car;
 
@@ -233,6 +233,10 @@ namespace Corron.Cars.ViewModels
         }
         private void ChangesRolledBack()
         {
+            if (_cvServiceLines.IsAddingNew)
+            {
+                _cvServiceLines.CancelNew();
+            }
             _cvServiceLines.Refresh();
             _sortedServices.Refresh();
             ScreenEditingMode = false;
