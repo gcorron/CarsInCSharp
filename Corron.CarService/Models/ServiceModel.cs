@@ -13,8 +13,8 @@ namespace Corron.CarService
         private ServiceModel _editCopy;
         private List<ServiceLineModel> _editServiceLines;
  
-        const string MONEY_FORMAT = "{0:0.00}";
-        public readonly string[] _validateProperties = { "TechName", "ServiceDate" };
+        private const string MONEY_FORMAT = "{0:0.00}";
+        private string[] _validateProperties = { "TechName", "ServiceDate" };
 
 
         public delegate void RollBackNotifyDelegate();
@@ -50,13 +50,9 @@ namespace Corron.CarService
         [DataMember]
         public List<ServiceLineModel> ServiceLineList
         {
-            get
-            {
-                return _serviceLineList;
-            }
+            get => _serviceLineList;
         }
         private List<ServiceLineModel> _serviceLineList;
-
 
         [DataMember]
         public int ServiceID { get; set; }
@@ -67,7 +63,7 @@ namespace Corron.CarService
         [DataMember]
         public DateTime ServiceDate
         {
-            get { return _serviceDate; }
+            get => _serviceDate;
             set {
                 _serviceDate = value;
                 NotifyOfPropertyChange();
@@ -80,7 +76,7 @@ namespace Corron.CarService
         [DataMember]
         public string TechName
         {
-            get { return _techName; }
+            get => _techName;
             set {
                 _techName = value;
                 NotifyOfPropertyChange();
@@ -92,9 +88,8 @@ namespace Corron.CarService
         [DataMember]
         public decimal LaborCost
         {
-            get { return _laborCost; }
-            set
-            {
+            get => _laborCost;
+            set {
                 _laborCost = value;
                 NotifyOfPropertyChange();
             }
@@ -105,9 +100,8 @@ namespace Corron.CarService
         [DataMember]
         public decimal PartsCost
         {
-            get { return _partsCost; }
-            set
-            {
+            get => _partsCost;
+            set {
                 _partsCost = value;
                 NotifyOfPropertyChange();
             }
@@ -116,10 +110,7 @@ namespace Corron.CarService
 
         public decimal TotalCost
         {
-            get
-            {
-                return _partsCost + _laborCost;
-            }
+            get => _partsCost + _laborCost;
         }
 
         public bool IsValidState
@@ -189,12 +180,9 @@ namespace Corron.CarService
         }
 
         // Implements IDataErrorInfo
-        public string Error
+        public string Error // not used by WPF
         {
-            get
-            {
-                return string.Empty;
-            }
+            get => String.Empty;
         }
 
         public string this[string columnName]

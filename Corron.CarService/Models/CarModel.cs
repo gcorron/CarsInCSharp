@@ -25,7 +25,7 @@ namespace Corron.CarService
         [DataMember]
         public string Make
         {
-            get { return _make; }
+            get => _make;
             set
             {
                 _make = value;
@@ -38,7 +38,7 @@ namespace Corron.CarService
         [DataMember]
         public string Model
         {
-            get { return _model; }
+            get => _model;
             set
             {
                 _model = value;
@@ -51,7 +51,7 @@ namespace Corron.CarService
         [DataMember]
         public int Year
         {
-            get { return _year; }
+            get => _year;
             set
             {
                 _year = value;
@@ -104,7 +104,7 @@ namespace Corron.CarService
         }
 
         // IDataErrorInfo
-        public string Error
+        public string Error // not used by WPF
         {
             get
             {

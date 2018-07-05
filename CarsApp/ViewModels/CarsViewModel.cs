@@ -26,7 +26,6 @@ namespace Corron.Cars.ViewModels
         public CarsViewModel()
         {
             BindingList<CarModel> _cars;
-
             _carList = DataAccess.GetCars();
             if (_carList is null)
                 return;
@@ -35,20 +34,16 @@ namespace Corron.Cars.ViewModels
             _carList.Sort();
             _cars = new BindingList<CarModel>(_carList); // load up cars from DB
             _cars.RaiseListChangedEvents = true;
-            _sortedCars =  new BindingListCollectionView(_cars);
+            SortedCars =  new BindingListCollectionView(_cars);
         }
 
         // Properties
 
-        public BindingListCollectionView SortedCars
-        {
-            get { return _sortedCars; }
-        }
-        private BindingListCollectionView _sortedCars;
+        public BindingListCollectionView SortedCars { get; set; }
 
         public ICarModel FieldedCar
         {
-            get { return _fieldedCar; }
+            get => _fieldedCar;
             set
             {
                 _fieldedCar = value;
@@ -92,7 +87,7 @@ namespace Corron.Cars.ViewModels
 
         public void Edit()
         {
-            _sortedCars.EditItem(_sortedCars.CurrentItem);
+            SortedCars.EditItem(SortedCars.CurrentItem);
             ScreenEditingMode = true;
         }
 
@@ -105,8 +100,8 @@ namespace Corron.Cars.ViewModels
                 {
                     if (DataAccess.DeleteCar(_fieldedCar.CarID))
                     {
-                        _sortedCars.Remove(_fieldedCar);
-                        _sortedCars.Refresh();
+                        SortedCars.Remove(_fieldedCar);
+                        SortedCars.Refresh();
                     }
                 }
                 catch (Exception e)
@@ -127,7 +122,7 @@ namespace Corron.Cars.ViewModels
         public void Add()
         {
             LastFieldedCar = FieldedCar;
-            FieldedCar = _sortedCars.AddNew() as ICarModel;
+            FieldedCar = SortedCars.AddNew() as ICarModel;
             ScreenEditingMode = true;
         }
 
@@ -139,41 +134,42 @@ namespace Corron.Cars.ViewModels
             DataAccess.UpdateCar(_fieldedCar as CarModel);
             if (isnew)
             { 
-                _sortedCars.CommitNew();
-                _sortedCars.MoveCurrentTo(_fieldedCar);
+                SortedCars.CommitNew();
+                SortedCars.MoveCurrentTo(_fieldedCar);
             }
             else
             {
-                _sortedCars.CommitEdit();
+                SortedCars.CommitEdit();
             }
             SelectedCarChanged.Invoke(this, _fieldedCar);
             _carList.Sort();
-            _sortedCars.Refresh();
+            SortedCars.Refresh();
             ScreenEditingMode = false;
         }
 
         public void Cancel()
         {
-            if (_sortedCars.IsAddingNew)
+            if (SortedCars.IsAddingNew)
             {
-                _sortedCars.CancelNew();
+                SortedCars.CancelNew();
                 FieldedCar=LastFieldedCar;
             }
-            else if (_sortedCars.IsEditingItem)
-                _sortedCars.CancelEdit();
+            else if (SortedCars.IsEditingItem)
+                SortedCars.CancelEdit();
             ScreenEditingMode = false;
 
          }
 
-        private void _cars_ListChanged(object sender, ListChangedEventArgs e)
-        {
-            _carList.Sort();
-            //_sortedCars.Refresh();
-        }
-        private void _sortedCars_CurrentChanged(object sender, EventArgs e)
-        {
-            FieldedCar = _sortedCars.CurrentItem as ICarModel;
-            SelectedCarChanged?.Invoke(this, FieldedCar);
-        }
+        //private void _cars_ListChanged(object sender, ListChangedEventArgs e)
+        //{
+        //    _carList.Sort();
+        //    //SortedCars.Refresh();
+        //}
+
+        //private void SortedCars_CurrentChanged(object sender, EventArgs e)
+        //{
+        //    FieldedCar = SortedCars.CurrentItem as ICarModel;
+        //    SelectedCarChanged?.Invoke(this, FieldedCar);
+        //}
     }
 }

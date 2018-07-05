@@ -15,11 +15,18 @@ namespace Corron.Cars.ViewModels
         private ICarModel _selectedCar;
         private CarsViewModel _carsScreen;
         private ServicesViewModel _servicesScreen;
-        private char _screentype;
+
+        private enum ScreenTypes
+        {
+            Car,
+            Service
+        }
+
+        private ScreenTypes _screentype;
         private bool _canChangeScreen;
         private bool _waitingForCar;
 
-        //Constructor
+     //Constructor
         public ShellViewModel()
         {
             ConnectMethod=DataAccess.Initialize(ShowErrorMessage);
@@ -29,7 +36,7 @@ namespace Corron.Cars.ViewModels
             NotifyOfPropertyChange(() => ErrorMessageVisible);
         }
 
-        //Event Handlers
+     //Event Handlers
         private void OnScreenStateChanged(object sender, bool e)
         {
             if (SelectedCar is null)
@@ -49,7 +56,7 @@ namespace Corron.Cars.ViewModels
             }
         }
 
-        //Properties
+     //Properties
 
         public string ConnectMethod { get; set; }
 
@@ -57,11 +64,11 @@ namespace Corron.Cars.ViewModels
         {
             get
             {
-                return (_screentype == 'C');
+                return (_screentype == ScreenTypes.Car);
             }
             set
             {
-                _screentype = 'C';
+                _screentype = ScreenTypes.Car;
                 NotifyOfPropertyChange(() => ServicesScreen);
                 NotifyOfPropertyChange(); 
 
@@ -79,7 +86,7 @@ namespace Corron.Cars.ViewModels
         {
             get
             {
-                return (_screentype == 'S');
+                return (_screentype == ScreenTypes.Service);
             }
             set
             {
@@ -92,7 +99,7 @@ namespace Corron.Cars.ViewModels
                     return; //error loading from DB, don't show services screen
 
                 this.ActivateItem((IScreen)_servicesScreen);
-                _screentype = 'S';
+                _screentype = ScreenTypes.Service;
                 NotifyOfPropertyChange(() => CarsScreen);
                 NotifyOfPropertyChange();
             }
@@ -100,10 +107,7 @@ namespace Corron.Cars.ViewModels
 
         public ICarModel SelectedCar
         {
-            get
-            {
-                return _selectedCar;
-            }
+            get => _selectedCar;
             set
             {
                 _selectedCar = value;
@@ -114,7 +118,7 @@ namespace Corron.Cars.ViewModels
 
         public bool CanChangeScreen
         {
-            get { return _canChangeScreen; }
+            get => _canChangeScreen;
             set
             {
                 _canChangeScreen = value;
@@ -134,11 +138,13 @@ namespace Corron.Cars.ViewModels
             }       
         }
 
+     //Methods
         private void ShowErrorMessage(string message)
         {
             ErrorMessage = message;
             NotifyOfPropertyChange(() => ErrorMessage);
             NotifyOfPropertyChange(() => ErrorMessageVisible);
+
         }
         public void ClearError()
         {

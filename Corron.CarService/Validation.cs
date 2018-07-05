@@ -6,44 +6,59 @@ using System.Threading.Tasks;
 
 namespace Corron.CarService
 {
-    internal static class Validation
+    public static class Validation
     {
+        public const string NNV =  "Non-numeric value.";
+        public const string MD = "Missing decimal.";
+        public const string ICA = "Invalid currency amount.";
+        public const string AMNBN = "Amount must not be negative.";
+        public const string FMNBB = "Field must not be blank.";
+        public const string FITL = "Field is too long.";
+        public const string OK = null;
+
         public static string ValidateCostString(string cost, out decimal dcost)
         {
 
+            dcost = 0;
+            if (String.IsNullOrWhiteSpace(cost))
+                return FMNBB;
+
             if (!decimal.TryParse(cost, out dcost))
-                return "Non-numeric value.";
+                return NNV;
 
 
             int i = cost.IndexOf('.');
             if (i < 0)
-                return "Missing decimal";
+                return MD;
 
             if (i == cost.Length - 3)
-                return ValidateCost(dcost);
+                return ValidateCost(ref dcost);
             else
             {
                 dcost = 0;
-                return "Invalid currency amount.";
+                return ICA;
             }
         }
 
-        public static string ValidateCost(decimal cost)
+        public static string ValidateCost(ref decimal cost)
         {
             if (cost < 0)
-                return "Amount must not be negative.";
+            {
+                cost = 0;
+                return AMNBN;
+            }
             else
-                return null;
+                return OK;
         }
 
         public static string FiftyNoBlanks(string Test)
         {
             if (String.IsNullOrWhiteSpace(Test))
-                return "Field must not be blank.";
+                return FMNBB;
             else if (Test.Length > 50)
-                return "Field is too long.";
+                return FITL;
             else
-                return null;
+                return OK;
         }
     }
 }

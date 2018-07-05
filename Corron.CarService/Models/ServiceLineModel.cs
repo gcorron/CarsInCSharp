@@ -52,6 +52,7 @@ namespace Corron.CarService
             RecalcAction = rd;
             ValidChangedAction = vcd;
         }
+
         public static void NullDelegates()
         {
             RecalcAction = null;
@@ -68,7 +69,7 @@ namespace Corron.CarService
         [DataMember]
         public LineTypes ServiceLineType
         {
-            get { return _serviceLineType; }
+            get => _serviceLineType;
             set
             {
                 _serviceLineType = value;
@@ -80,13 +81,13 @@ namespace Corron.CarService
 
         public string ServiceLineTypeString
         {
-            get { return new[] { "Labor", "Parts" }[(int)_serviceLineType]; }
+            get => new[] { "Labor", "Parts" }[(int)_serviceLineType];
         }
 
         [DataMember]
         public string ServiceLineDesc
         {
-            get { return _serviceLineDesc; }
+            get => _serviceLineDesc;
             set
             {
                 _serviceLineDesc = value;
@@ -119,10 +120,7 @@ namespace Corron.CarService
         private string _serviceLineChargeString;
 
         public bool Delete {
-            get
-            {
-                return _delete;
-            }
+            get => _delete;
             set
             {
                 _delete = value;
@@ -131,8 +129,6 @@ namespace Corron.CarService
             }
         }
         private bool _delete;
-
- 
 
         public bool IsValidState
         {
@@ -167,12 +163,9 @@ namespace Corron.CarService
         }
 
         // Implements IDataErrorInfo
-        public string Error
+        public string Error // not used by WPF
         {
-            get
-            {
-                return string.Empty;
-            }
+            get =>string.Empty;
         }
 
 

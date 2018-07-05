@@ -19,7 +19,6 @@ namespace Corron.Cars.ViewModels
 
         private List<ServiceModel> _serviceList;
         private BindingList<ServiceModel> _services;
-        private BindingListCollectionView _sortedServices;
 
 
         private ServiceModel _fieldedService;
@@ -51,9 +50,9 @@ namespace Corron.Cars.ViewModels
             _services = new BindingList<ServiceModel>(_serviceList);
             _services.RaiseListChangedEvents = true;
 
-            _sortedServices = new BindingListCollectionView(_services);
-            _sortedServices.MoveCurrentToFirst();
-            FieldedService = _sortedServices.CurrentItem as ServiceModel;
+            SortedServices = new BindingListCollectionView(_services);
+            SortedServices.MoveCurrentToFirst();
+            FieldedService = SortedServices.CurrentItem as ServiceModel;
 
 
             NotifyOfPropertyChange(() => SortedServices);
@@ -67,10 +66,7 @@ namespace Corron.Cars.ViewModels
 
         // Objects
 
-        public BindingListCollectionView SortedServices
-        {
-            get { return _sortedServices; }
-        }
+        public BindingListCollectionView SortedServices { get; set; }
 
         public ServiceModel FieldedService
         {
@@ -116,7 +112,6 @@ namespace Corron.Cars.ViewModels
         {
             //Binding detail lines
             _blServiceLines = new BindingList<ServiceLineModel>(FieldedService.ServiceLineList);
-            //            _blServiceLines.RaiseListChangedEvents = true;
             _cvServiceLines = new BindingListCollectionView(_blServiceLines);
         }
 
@@ -124,7 +119,7 @@ namespace Corron.Cars.ViewModels
         //Misc. State
         public bool ScreenEditingMode
         {
-            get { return _screenEditingMode; }
+            get => _screenEditingMode;
             set
             {
                 _screenEditingMode = value;
@@ -136,31 +131,28 @@ namespace Corron.Cars.ViewModels
 
         public bool NotScreenEditingMode
         {
-            get { return !_screenEditingMode; }
+            get => !_screenEditingMode;
         }
 
         //Command Methods
 
         public void Edit()
         {
-            _sortedServices.EditItem(_sortedServices.CurrentItem);
+            SortedServices.EditItem(SortedServices.CurrentItem);
             ScreenEditingMode = true;
         }
         public bool CanEdit // keep as property!
         {
-            get
-            {
-                return _sortedServices.Count > 0;
-            }
+            get => SortedServices.Count > 0;
         }
 
         public void Add()
         {
-            if (_sortedServices.Count == 0)
+            if (SortedServices.Count == 0)
                 _listBookMark = -1;
             else
-                _listBookMark = _sortedServices.CurrentPosition;
-            FieldedService = _sortedServices.AddNew() as ServiceModel;
+                _listBookMark = SortedServices.CurrentPosition;
+            FieldedService = SortedServices.AddNew() as ServiceModel;
             FieldedService.CarID = _car.CarID;
             FieldedService.ServiceDate = DateTime.Today;
             ScreenEditingMode = true;
@@ -173,18 +165,15 @@ namespace Corron.Cars.ViewModels
             {
                 if (DataAccess.DeleteService(_fieldedService.ServiceID))
                 {
-                    _sortedServices.Remove(_fieldedService);
-                    _sortedServices.Refresh();
+                    SortedServices.Remove(_fieldedService);
+                    SortedServices.Refresh();
                     NotifyOfPropertyChange(() => CanDelete);
                 }
             }
         }
         public bool CanDelete // keep as property!
         {
-            get
-            {
-                return _sortedServices.Count > 0;
-            }
+            get => SortedServices.Count > 0;
         }
 
 
@@ -201,20 +190,21 @@ namespace Corron.Cars.ViewModels
 
             if (isnew)
             {
-                _sortedServices.CommitNew();
-                _sortedServices.MoveCurrentTo(_fieldedService);
+                SortedServices.CommitNew();
+                SortedServices.MoveCurrentTo(_fieldedService);
             }
             else
             {
-                _sortedServices.CommitEdit();
+                SortedServices.CommitEdit();
             }
             _serviceList.Sort();
-            _sortedServices.Refresh();
+            SortedServices.Refresh();
             ServiceLines.Refresh();
             NotifyOfPropertyChange(() => CanDelete);
             NotifyOfPropertyChange(() => CanEdit);
             ScreenEditingMode = false;
         }
+
         public bool CanSave(bool fieldedService_IsValidState, bool screenEditingMode)
         {
             if (ScreenEditingMode == false)
@@ -226,10 +216,10 @@ namespace Corron.Cars.ViewModels
         public void Cancel()
         {
 
-            if (_sortedServices.IsAddingNew)
-                _sortedServices.CancelNew();
-            else if (_sortedServices.IsEditingItem)
-                _sortedServices.CancelEdit();
+            if (SortedServices.IsAddingNew)
+                SortedServices.CancelNew();
+            else if (SortedServices.IsEditingItem)
+                SortedServices.CancelEdit();
         }
         private void ChangesRolledBack()
         {
@@ -238,7 +228,7 @@ namespace Corron.Cars.ViewModels
                 _cvServiceLines.CancelNew();
             }
             _cvServiceLines.Refresh();
-            _sortedServices.Refresh();
+            SortedServices.Refresh();
             ScreenEditingMode = false;
         }
     }

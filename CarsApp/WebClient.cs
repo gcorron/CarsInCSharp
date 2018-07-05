@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Formatting;
 using Corron.CarService;
+using System.Diagnostics;
 
 namespace Corron.Cars
 {
@@ -36,6 +37,7 @@ namespace Corron.Cars
 
         public static List<CarModel> GetCars()
         {
+
             try
             {
                 return GetCarsTask().GetAwaiter().GetResult();
