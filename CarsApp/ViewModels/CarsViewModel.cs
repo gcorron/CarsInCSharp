@@ -18,7 +18,6 @@ namespace Corron.Cars.ViewModels
     class CarsViewModel : Screen
     {
         private List<CarModel> _carList;
-        private int _listBookMark;
 
         public event EventHandler<ICarModel> SelectedCarChanged;
         public event EventHandler<bool> ScreenStateChanged;
@@ -87,7 +86,7 @@ namespace Corron.Cars.ViewModels
 
         public void Edit()
         {
-            SortedCars.EditItem(SortedCars.CurrentItem);
+            SortedCars.EditItem(FieldedCar);
             ScreenEditingMode = true;
         }
 
@@ -152,10 +151,13 @@ namespace Corron.Cars.ViewModels
             if (SortedCars.IsAddingNew)
             {
                 SortedCars.CancelNew();
-                FieldedCar=LastFieldedCar;
+                FieldedCar = LastFieldedCar;
             }
             else if (SortedCars.IsEditingItem)
+            { 
                 SortedCars.CancelEdit();
+            }
+
             ScreenEditingMode = false;
 
          }

@@ -85,8 +85,8 @@ namespace Corron.Cars.ViewModels
             get
             {
                 var LineTypesList = new List<NameValueByte>();
-                LineTypesList.Add(new NameValueByte() { Name = "Labor", Value = ServiceLineModel.LineTypes.Labor });
-                LineTypesList.Add(new NameValueByte() { Name = "Parts", Value = ServiceLineModel.LineTypes.Parts });
+                LineTypesList.Add(new NameValueByte(ServiceLineModel.LineTypes.Labor, "Labor"));
+                LineTypesList.Add(new NameValueByte(ServiceLineModel.LineTypes.Parts,"Parts"));
                 return LineTypesList;
             }
         }
@@ -232,10 +232,16 @@ namespace Corron.Cars.ViewModels
             ScreenEditingMode = false;
         }
     }
-    // Tiny helper class
+    // Tiny helper class (immutable)
     public class NameValueByte
     {
-        public ServiceLineModel.LineTypes Value { get; set; }
-        public string Name { get; set; }
+        public ServiceLineModel.LineTypes Value { get; }
+        public string Name { get;}
+
+        internal NameValueByte(ServiceLineModel.LineTypes value, string name)
+        {
+            Value = value;
+            Name = name;
+        }
     }
 }
