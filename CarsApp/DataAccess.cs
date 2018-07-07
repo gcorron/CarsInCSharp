@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Corron.CarService;
 using System.Data;
 using System.Configuration;
+using System.Xml;
 
 namespace Corron.Cars
 {
@@ -83,6 +84,10 @@ namespace Corron.Cars
                 return WebClient.DeleteService(id);
         }
 
+        public static XmlDocument GetCarsXML()
+        {
+            return SQLData.GetCarsXML();
+        }
 
     }
 }
