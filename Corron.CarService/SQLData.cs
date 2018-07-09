@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using Dapper;
+using System.Xml;
 
 namespace Corron.CarService
 {
@@ -37,6 +38,28 @@ namespace Corron.CarService
                 return null;
             }
         }
+
+        public static string GetCarsXML()
+        {
+            try
+            {
+                using (IDbConnection connection = GetJoesDBConnection())
+                {
+                    List<string> results;
+                    results = connection.Query<string>("SelectCarsXml") as List<string>;
+                    return results[0];
+                }
+            }
+            catch (Exception e)
+            {
+                if (e.InnerException is null)
+                    _handleError(e.Message);
+                else
+                    _handleError(e.InnerException.Message);
+                return null;
+            }
+        }
+
 
         public static List<ServiceModel> GetServices(int CarID)
         {

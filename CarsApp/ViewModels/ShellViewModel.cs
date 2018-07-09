@@ -15,11 +15,13 @@ namespace Corron.Cars.ViewModels
         private ICarModel _selectedCar;
         private CarsViewModel _carsScreen;
         private ServicesViewModel _servicesScreen;
+        private ReportViewModel _reportScreen;
 
         private enum ScreenTypes
         {
             Car,
-            Service
+            Service,
+            Report
         }
 
         private ScreenTypes _screentype;
@@ -36,18 +38,18 @@ namespace Corron.Cars.ViewModels
             NotifyOfPropertyChange(() => ErrorMessageVisible);
         }
 
-     //Event Handlers
-        private void OnScreenStateChanged(object sender, bool e)
+     //My Notification Methods
+        private void OnScreenStateChanged(bool canChangeScreen)
         {
             if (SelectedCar is null)
                 _waitingForCar = true;
             else
-                CanChangeScreen = e;
+                CanChangeScreen = canChangeScreen;
         }
 
-        private void OnSelectedCarChanged(object sender, ICarModel e)
+        private void OnSelectedCarChanged(ICarModel car)
         {
-            SelectedCar = e;
+            SelectedCar = car;
             if (_waitingForCar)
             {
                 CanChangeScreen = true;
@@ -69,14 +71,10 @@ namespace Corron.Cars.ViewModels
             set
             {
                 _screentype = ScreenTypes.Car;
-                NotifyOfPropertyChange(() => ServicesScreen);
-                NotifyOfPropertyChange(); 
-
+                NotifyScreenTypeChange();
                 if (_carsScreen == null)
                 {
-                    _carsScreen = new CarsViewModel();
-                    _carsScreen.SelectedCarChanged += OnSelectedCarChanged;
-                    _carsScreen.ScreenStateChanged += OnScreenStateChanged;
+                    _carsScreen = new CarsViewModel(OnSelectedCarChanged,OnScreenStateChanged);
                 }
                 this.ActivateItem((IScreen)_carsScreen);
             }
@@ -92,17 +90,41 @@ namespace Corron.Cars.ViewModels
             {
                 if (_servicesScreen == null)
                 {
-                    _servicesScreen = new ServicesViewModel();
-                    _servicesScreen.ScreenStateChanged += OnScreenStateChanged;
+                    _servicesScreen = new ServicesViewModel(OnScreenStateChanged);
                 }
                 if (!_servicesScreen.LoadServiceData(_carsScreen.FieldedCar))
                     return; //error loading from DB, don't show services screen
 
                 this.ActivateItem((IScreen)_servicesScreen);
                 _screentype = ScreenTypes.Service;
-                NotifyOfPropertyChange(() => CarsScreen);
-                NotifyOfPropertyChange();
+                NotifyScreenTypeChange();
             }
+        }
+
+        public bool ReportScreen
+        {
+            get
+            {
+                return (_screentype == ScreenTypes.Report);
+            }
+            set
+            {
+                if (_reportScreen == null)
+                {
+                    _reportScreen = new ReportViewModel(OnScreenStateChanged);
+                }
+ 
+                this.ActivateItem((IScreen)_reportScreen);
+                _screentype = ScreenTypes.Report;
+                NotifyScreenTypeChange();
+            }
+        }
+
+        private void NotifyScreenTypeChange()
+        {
+            NotifyOfPropertyChange(() => CarsScreen);
+            NotifyOfPropertyChange(() => ServicesScreen);
+            NotifyOfPropertyChange(() => ReportScreen);
         }
 
         public ICarModel SelectedCar

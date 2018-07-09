@@ -16,6 +16,8 @@ namespace Corron.Cars
 
         private static bool _useSQL;
 
+        private const string XMLHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>/n";
+
         public static string Initialize(SQLData.HandleError handleError)
         {
             string webAddress = Corron.CarService.SQLData.WebConnection();
@@ -84,10 +86,10 @@ namespace Corron.Cars
                 return WebClient.DeleteService(id);
         }
 
-        public static XmlDocument GetCarsXML()
+        public static String GetCarsXML()
         {
+
             return SQLData.GetCarsXML();
         }
-
     }
 }

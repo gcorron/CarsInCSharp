@@ -34,7 +34,8 @@
                 <StackPanel IsEnabled="{Binding CanChangeScreen}" Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
                     <RadioButton x:Name="CarsScreen" GroupName="Screen" Content="Cars" Margin="5" VerticalAlignment="Center"/>
                     <RadioButton x:Name="ServicesScreen" GroupName="Screen" Content="Services" Margin="5" VerticalAlignment="Center"/>
-                    <TextBlock Text="     Car:   " VerticalAlignment="Center"/>
+                    <RadioButton x:Name="ReportScreen" GroupName="Screen" Content="Reports" Margin="5" VerticalAlignment="Center"/>
+            <TextBlock Text="     Car:   " VerticalAlignment="Center"/>
             <TextBlock VerticalAlignment="Center" Style="{StaticResource WaitingForCar}"/>
         </StackPanel>
             <ContentControl x:Name="ActiveItem" Grid.Row="2" Grid.Column="1"/>

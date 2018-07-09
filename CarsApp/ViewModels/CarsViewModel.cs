@@ -19,11 +19,18 @@ namespace Corron.Cars.ViewModels
     {
         private List<CarModel> _carList;
 
-        public event EventHandler<ICarModel> SelectedCarChanged;
-        public event EventHandler<bool> ScreenStateChanged;
+        //public event EventHandler<ICarModel> SelectedCarChanged;
+        //public event EventHandler<bool> ScreenStateChanged;
+        public delegate void SelectedCarChanged(ICarModel CarModel);
+        public delegate void ScreenStateChanged(bool CanChangeScreen);
+        private SelectedCarChanged _notifyCarChanged;
+        private ScreenStateChanged _notifySSChanged;
 
-        public CarsViewModel()
+        public CarsViewModel(SelectedCarChanged notifyCarChanged, ScreenStateChanged notifySSChanged)
         {
+            _notifyCarChanged = notifyCarChanged;
+            _notifySSChanged = notifySSChanged;
+
             BindingList<CarModel> _cars;
             _carList = DataAccess.GetCars();
             if (_carList is null)
@@ -47,7 +54,7 @@ namespace Corron.Cars.ViewModels
             {
                 _fieldedCar = value;
                 NotifyOfPropertyChange(() => FieldedCar);
-                SelectedCarChanged?.Invoke(this, FieldedCar);
+                _notifyCarChanged(FieldedCar);
             }
         }
         private ICarModel _fieldedCar;
@@ -71,7 +78,7 @@ namespace Corron.Cars.ViewModels
                 _screenEditingMode = value;
                 NotifyOfPropertyChange("ScreenEditingMode");
                 NotifyOfPropertyChange("NotScreenEditingMode");
-                ScreenStateChanged?.Invoke(this, !_screenEditingMode);
+                _notifySSChanged(NotScreenEditingMode);
             }
         }
         private bool _screenEditingMode;
@@ -140,7 +147,7 @@ namespace Corron.Cars.ViewModels
             {
                 SortedCars.CommitEdit();
             }
-            SelectedCarChanged.Invoke(this, _fieldedCar);
+            _notifyCarChanged(_fieldedCar);
             _carList.Sort();
             SortedCars.Refresh();
             ScreenEditingMode = false;
@@ -162,16 +169,9 @@ namespace Corron.Cars.ViewModels
 
          }
 
-        //private void _cars_ListChanged(object sender, ListChangedEventArgs e)
-        //{
-        //    _carList.Sort();
-        //    //SortedCars.Refresh();
-        //}
-
-        //private void SortedCars_CurrentChanged(object sender, EventArgs e)
-        //{
-        //    FieldedCar = SortedCars.CurrentItem as ICarModel;
-        //    SelectedCarChanged?.Invoke(this, FieldedCar);
-        //}
+        public void Report()
+        {
+            DataAccess.GetCarsXML();
+        }
     }
 }

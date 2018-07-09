@@ -26,7 +26,14 @@ namespace Corron.Cars.ViewModels
         private ICarModel _car;
         private int _listBookMark;
 
-        public EventHandler<bool> ScreenStateChanged;
+        public delegate void ScreenStateChanged(bool canChangeScreen);
+        private ScreenStateChanged _screenStateChanged;
+
+
+        public ServicesViewModel(ScreenStateChanged screenStateChanged)
+        {
+            _screenStateChanged = screenStateChanged;
+        }
 
         //Load Data, always call on activation!
         public bool LoadServiceData(ICarModel car)
@@ -125,7 +132,7 @@ namespace Corron.Cars.ViewModels
                 _screenEditingMode = value;
                 NotifyOfPropertyChange(() => ScreenEditingMode);
                 NotifyOfPropertyChange(() => NotScreenEditingMode);
-                ScreenStateChanged?.Invoke(this, !_screenEditingMode);
+                _screenStateChanged(!_screenEditingMode);
             }
         }
 

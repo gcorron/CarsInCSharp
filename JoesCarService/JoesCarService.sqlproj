@@ -74,5 +74,6 @@
     <Build Include="dbo\Stored Procedures\UpdateCar.sql" />
     <Build Include="dbo\Stored Procedures\UpdateService.sql" />
     <Build Include="dbo\Stored Procedures\UpdateServiceLine.sql" />
+    <Build Include="dbo\Stored Procedures\SelectCarsXml.sql" />
   </ItemGroup>
 </Project>
