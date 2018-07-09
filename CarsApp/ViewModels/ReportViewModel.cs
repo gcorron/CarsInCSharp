@@ -28,34 +28,40 @@ namespace Corron.Cars.ViewModels
 
         public void CarsReport()
         {
-            XmlBox = FormatXml(DataAccess.GetCarsXML());
-            NotifyOfPropertyChange(() => XmlBox);
+            HtmlToDisplay = TransformXML(DataAccess.GetCarsXML(),1); //TODO replace with constant or enum
+            NotifyOfPropertyChange(() => HtmlToDisplay);
         }
 
-        protected string FormatXml(string xmlString)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(xmlString);
-            StringBuilder sb = new StringBuilder();
-            System.IO.TextWriter tr = new System.IO.StringWriter(sb);
-            XmlTextWriter wr = new XmlTextWriter(tr);
-            wr.Formatting = Formatting.Indented;
-            doc.Save(wr);
-            wr.Close();
-            return sb.ToString();
-        }
 
-        protected void TransformXML(string xmlString)
+        protected string TransformXML(string xmlString, int xsltSheetId)
         {
-            // Load the style sheet.
+
+            if (String.IsNullOrEmpty(xmlString))
+                return null;
+
             XslCompiledTransform xslt = new XslCompiledTransform();
-            xslt.Load("output.xsl");
 
-            // Create the FileStream.
-            using (FileStream fs = new FileStream(@"c:\data\output.xml", FileMode.Create))
+            //prepare the stylesheet
+            string xsltString = DataAccess.GetXSLTSheet(xsltSheetId);
+            if (String.IsNullOrEmpty(xsltString))
+                return null;
+
+            using (XmlReader xr = XmlReader.Create(new StringReader(xsltString)))
             {
-                // Execute the transformation.
-                xslt.Transform(new XPathDocument("books.xml"), null, fs);
+                xslt.Load(xr);
+            }
+
+            //prepare the XML
+            using (XmlReader xr = XmlReader.Create(new StringReader(xmlString)))
+            {
+
+                var sb = new StringBuilder();
+                using (XmlWriter xw = XmlWriter.Create(sb))
+                {
+                    // Execute the transformation.
+                    xslt.Transform(xr, xw);
+                    return sb.ToString();
+                }
             }
         }
     }

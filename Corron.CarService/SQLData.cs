@@ -14,7 +14,9 @@ namespace Corron.CarService
         public delegate void HandleError(string Message);
 
         private static HandleError _handleError;
- 
+
+        private const string XMLHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+
         public static void Initialize(HandleError handleError)
         {
             _handleError = handleError;
@@ -38,28 +40,6 @@ namespace Corron.CarService
                 return null;
             }
         }
-
-        public static string GetCarsXML()
-        {
-            try
-            {
-                using (IDbConnection connection = GetJoesDBConnection())
-                {
-                    List<string> results;
-                    results = connection.Query<string>("SelectCarsXml") as List<string>;
-                    return results[0];
-                }
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException is null)
-                    _handleError(e.Message);
-                else
-                    _handleError(e.InnerException.Message);
-                return null;
-            }
-        }
-
 
         public static List<ServiceModel> GetServices(int CarID)
         {
@@ -185,6 +165,51 @@ namespace Corron.CarService
                 return false;
             }
         }
+//reports
+
+        public static string GetXSLTSheet(int id)
+        {
+            try
+            {
+                using (IDbConnection connection = GetJoesDBConnection())
+                {
+                    List<string> results;
+                    results = connection.Query<string>($"SelectXSLTSheet @id={id}") as List<string>;
+                    return XMLHeader + results[0]; 
+                }
+            }
+            catch (Exception e)
+            {
+                if (e.InnerException is null)
+                    _handleError(e.Message);
+                else
+                    _handleError(e.InnerException.Message);
+                return null;
+            }
+
+        }
+
+        public static string GetCarsXML()
+        {
+            try
+            {
+                using (IDbConnection connection = GetJoesDBConnection())
+                {
+                    List<string> results;
+                    results = connection.Query<string>("SelectCarsXml") as List<string>;
+                    return XMLHeader + results[0];
+                }
+            }
+            catch (Exception e)
+            {
+                if (e.InnerException is null)
+                    _handleError(e.Message);
+                else
+                    _handleError(e.InnerException.Message);
+                return null;
+            }
+        }
+
 
         public static string WebConnection()
         {

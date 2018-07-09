@@ -19,8 +19,6 @@ namespace Corron.Cars.ViewModels
     {
         private List<CarModel> _carList;
 
-        //public event EventHandler<ICarModel> SelectedCarChanged;
-        //public event EventHandler<bool> ScreenStateChanged;
         public delegate void SelectedCarChanged(ICarModel CarModel);
         public delegate void ScreenStateChanged(bool CanChangeScreen);
         private SelectedCarChanged _notifyCarChanged;

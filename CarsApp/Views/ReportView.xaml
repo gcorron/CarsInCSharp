@@ -25,8 +25,7 @@
         </Grid.ColumnDefinitions>
         <WebBrowser
             local:BrowserBehavior.Html ="{Binding HtmlToDisplay}"  
-            Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        <TextBox x:Name="XmlBox" Grid.Row="2" Grid.Column="1" IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"/>
+            Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <Button x:Name="CarsReport" Content="Test" Margin="5"/>
         </StackPanel>
