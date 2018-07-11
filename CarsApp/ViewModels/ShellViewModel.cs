@@ -28,10 +28,14 @@ namespace Corron.Cars.ViewModels
         private bool _canChangeScreen;
         private bool _waitingForCar;
 
-     //Constructor
+        public delegate void ErrorHandler(Exception e);
+        public delegate void SelectedCarChanged(ICarModel CarModel);
+        public delegate void ScreenStateChanged(bool CanChangeScreen);
+
+        //Constructor
         public ShellViewModel()
         {
-            ConnectMethod=DataAccess.Initialize(ShowErrorMessage);
+            ConnectMethod=DataAccess.Initialize();
             CarsScreen = true;
             CanChangeScreen = false;
             _waitingForCar = true;
@@ -74,7 +78,7 @@ namespace Corron.Cars.ViewModels
                 NotifyScreenTypeChange();
                 if (_carsScreen == null)
                 {
-                    _carsScreen = new CarsViewModel(OnSelectedCarChanged,OnScreenStateChanged);
+                    _carsScreen = new CarsViewModel(OnSelectedCarChanged,OnScreenStateChanged,ShowErrorMessage);
                 }
                 this.ActivateItem((IScreen)_carsScreen);
             }
@@ -90,7 +94,7 @@ namespace Corron.Cars.ViewModels
             {
                 if (_servicesScreen == null)
                 {
-                    _servicesScreen = new ServicesViewModel(OnScreenStateChanged);
+                    _servicesScreen = new ServicesViewModel(OnScreenStateChanged,ShowErrorMessage);
                 }
                 if (!_servicesScreen.LoadServiceData(_carsScreen.FieldedCar))
                     return; //error loading from DB, don't show services screen
@@ -111,7 +115,7 @@ namespace Corron.Cars.ViewModels
             {
                 if (_reportScreen == null)
                 {
-                    _reportScreen = new ReportViewModel(OnScreenStateChanged);
+                    _reportScreen = new ReportViewModel(OnScreenStateChanged,ShowErrorMessage);
                 }
  
                 this.ActivateItem((IScreen)_reportScreen);
@@ -150,6 +154,8 @@ namespace Corron.Cars.ViewModels
 
         public string ErrorMessage { get; set; }
 
+        private Exception CurrentException { get; set; }
+
         public Visibility ErrorMessageVisible
         {
             get {
@@ -160,18 +166,34 @@ namespace Corron.Cars.ViewModels
             }       
         }
 
-     //Methods
-        private void ShowErrorMessage(string message)
+
+        //Methods
+        private void ShowErrorMessage(Exception e)
         {
-            ErrorMessage = message;
+            if (e is null)
+                ErrorMessage = "";
+            else
+                ErrorMessage=e.Message;
+
+            CurrentException = e;
             NotifyOfPropertyChange(() => ErrorMessage);
             NotifyOfPropertyChange(() => ErrorMessageVisible);
+        }
+
+        public void ErrorDetails()
+        {
+            if (CurrentException is null)
+                MessageBox.Show("No details available","Details", MessageBoxButton.OK);
+            else
+                MessageBox.Show($"Error occured {CurrentException.StackTrace}" , "Details", MessageBoxButton.OK);
 
         }
+
         public void ClearError()
         {
-            ShowErrorMessage("");
+            ShowErrorMessage(null);
         }
+
     }
 
 }

@@ -43,15 +43,18 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" x:Name="ErrorMessage" Background="Red" MinWidth="200"
                      Height="40" TextWrapping="Wrap"/>
-                <Button Grid.Row="0" Grid.Column="1" x:Name="ClearError" Content="Clear"/>
-            </Grid>
+                <Button Grid.Row="0" Grid.Column="1" x:Name="ErrorDetails" Content="Details" Margin="5"/>
+                <Button Grid.Row="0" Grid.Column="2" x:Name="ClearError" Content="Clear" Margin="5"/>
+
+        </Grid>
         <TextBlock Grid.Row="4" Grid.Column="1" x:Name="ConnectMethod" VerticalAlignment="Center"/>
     </Grid>
 

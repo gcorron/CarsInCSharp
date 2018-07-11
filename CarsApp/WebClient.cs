@@ -15,11 +15,9 @@ namespace Corron.Cars
     {
 
         private static HttpClient _client;
-        private static SQLData.HandleError _handleError;
 
-        public static void Initialize(SQLData.HandleError handleError,string WebAddress)
+        public static void Initialize(string WebAddress)
         {
-            _handleError = handleError;               
 
             if (_client is null)
             {
@@ -37,16 +35,7 @@ namespace Corron.Cars
 
         public static List<CarModel> GetCars()
         {
-
-            try
-            {
-                return GetCarsTask().GetAwaiter().GetResult();
-            }
-            catch (Exception e)
-            {
-                ReportException(e);
-                return null;
-            }
+            return GetCarsTask().GetAwaiter().GetResult();
         }
 
         public static async Task<List<CarModel>> GetCarsTask()
@@ -68,15 +57,7 @@ namespace Corron.Cars
 
         public static List<ServiceModel> GetServices(int CarID)
         {
-            try
-            {
-                return GetServicesTask(CarID).GetAwaiter().GetResult();
-            }
-            catch (Exception e)
-            {
-                ReportException(e);
-                return null;
-            }
+            return GetServicesTask(CarID).GetAwaiter().GetResult();
         }
 
         public static async Task<List<ServiceModel>> GetServicesTask(int CarID)
@@ -97,37 +78,21 @@ namespace Corron.Cars
         }
         public static bool UpdateCar(CarModel car)
         {
-            try
+            switch(car.CarID.CompareTo(0))
             {
-                switch(car.CarID.CompareTo(0))
-                {
-                    case 0:
-                        car.CarID = PostCarTask(car).GetAwaiter().GetResult();
-                        break;
-                    case 1:
-                        car.CarID = PutCarTask(car).GetAwaiter().GetResult();
-                        break;
-                }
-            }
-            catch (Exception e)
-            {
-                ReportException(e);
-                return false;
+                case 0:
+                    car.CarID = PostCarTask(car).GetAwaiter().GetResult();
+                    break;
+                case 1:
+                    car.CarID = PutCarTask(car).GetAwaiter().GetResult();
+                    break;
             }
             return true;
         }
 
         public static bool DeleteCar(int id)
         {
-            try
-            {
-                return (DeleteCarTask(id).GetAwaiter().GetResult()==0);
-            }
-            catch (Exception e)
-            {
-                ReportException(e);
-                return false;
-            }
+            return (DeleteCarTask(id).GetAwaiter().GetResult()==0);
         }
 
         public static async Task<int> PutCarTask(CarModel car)
@@ -188,37 +153,21 @@ namespace Corron.Cars
 
         public static bool UpdateService(ServiceModel service)
         {
-            try
+            switch (service.ServiceID.CompareTo(0))
             {
-                switch (service.ServiceID.CompareTo(0))
-                {
-                    case 0:
-                        service.ServiceID = PostServiceTask(service).GetAwaiter().GetResult();
-                        break;
-                    case 1:
-                        service.ServiceID = PutServiceTask(service).GetAwaiter().GetResult();
-                        break;
-                }
-            }
-            catch (Exception e)
-            {
-                ReportException(e);
-                return false;
+                case 0:
+                    service.ServiceID = PostServiceTask(service).GetAwaiter().GetResult();
+                    break;
+                case 1:
+                    service.ServiceID = PutServiceTask(service).GetAwaiter().GetResult();
+                    break;
             }
             return true;
         }
 
         public static bool DeleteService(int id)
         {
-            try
-            { 
-                return (DeleteServiceTask(id).GetAwaiter().GetResult() == 0);
-            }
-            catch (Exception e)
-            {
-                ReportException(e);
-                return false;
-            }
+            return (DeleteServiceTask(id).GetAwaiter().GetResult() == 0);
         }
 
         public static async Task<int> PutServiceTask(ServiceModel service)
@@ -281,14 +230,6 @@ namespace Corron.Cars
         private static async Task<string> GetErrorDetailsFromResponse(HttpResponseMessage response)
         {
             return await response.Content.ReadAsAsync<string>().ConfigureAwait(false);
-        }
-
-        private static void ReportException(Exception e)
-        {
-            if (e.InnerException is null)
-                _handleError(e.Message);
-            else
-                _handleError(e.InnerException.Message);
         }
 
     }

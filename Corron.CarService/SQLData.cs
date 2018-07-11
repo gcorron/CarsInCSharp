@@ -11,201 +11,119 @@ namespace Corron.CarService
 {
     public static class SQLData
     {
-        public delegate void HandleError(string Message);
-
-        private static HandleError _handleError;
-
         private const string XMLHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-
-        public static void Initialize(HandleError handleError)
-        {
-            _handleError = handleError;
-        }
 
         public static List<CarModel> GetCars()
         {
-            try
+            using (IDbConnection connection = GetJoesDBConnection())
             {
-                using (IDbConnection connection = GetJoesDBConnection())
-                {
-                    return connection.Query<CarModel>("SelectCars").ToList<CarModel>();
-                }
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException is null)
-                    _handleError(e.Message);
-                else
-                    _handleError(e.InnerException.Message);
-                return null;
+                return connection.Query<CarModel>("SelectCars").ToList<CarModel>();
             }
         }
 
         public static List<ServiceModel> GetServices(int CarID)
         {
             var lookup = new Dictionary<int, ServiceModel>();
-            try
+            using (IDbConnection connection = GetJoesDBConnection())
             {
-                using (IDbConnection connection = GetJoesDBConnection())
-                {
-                    connection.Query<ServiceModel, ServiceLineModel, ServiceModel>
-                        ($"SelectServicesForCar @CarID", (S, L) =>
+                connection.Query<ServiceModel, ServiceLineModel, ServiceModel>
+                    ($"SelectServicesForCar @CarID", (S, L) =>
+                    {
+                        if (!lookup.TryGetValue(S.ServiceID, out ServiceModel SM))
                         {
-                            if (!lookup.TryGetValue(S.ServiceID, out ServiceModel SM))
-                            {
-                                lookup.Add(S.ServiceID, SM = S);
-                            }
+                            lookup.Add(S.ServiceID, SM = S);
+                        }
 
-                            SM.ServiceLineList.Add(L);
-                            return SM;
+                        SM.ServiceLineList.Add(L);
+                        return SM;
 
-                        }, new { CarID }, splitOn: "ServiceID");
-                }
-                return lookup.Values.ToList<ServiceModel>();
+                    }, new { CarID }, splitOn: "ServiceID");
             }
-            catch (Exception e)
-            {
-                _handleError(e.Message);
-                return null;
-            }
+            return lookup.Values.ToList<ServiceModel>();
         }
 
         public static bool UpdateCar(CarModel car)
         {
-            try
+            using (IDbConnection connection = GetJoesDBConnection())
             {
-                using (IDbConnection connection = GetJoesDBConnection())
-                {
 
-                    List<int> results;
-                    results = connection.Query<int>("dbo.UpdateCar @CarID, @Make, @Model, @Year, @Owner", car) as List<int>;
+                List<int> results;
+                results = connection.Query<int>("dbo.UpdateCar @CarID, @Make, @Model, @Year, @Owner", car) as List<int>;
 
-                    if (results[0] >= 0 && car.CarID <= 0)
-                        car.CarID = results[0];
-                }
-            }
-            catch (Exception e)
-            {
-                _handleError(e.Message);
-                return false;
+                if (results[0] >= 0 && car.CarID <= 0)
+                    car.CarID = results[0];
             }
             return true;
         }
 
         public static bool UpdateService(ServiceModel service)
         {
-            try
+            using (IDbConnection connection = GetJoesDBConnection())
             {
-                using (IDbConnection connection = GetJoesDBConnection())
+                List<int> results;
+                results = connection.Query<int>("dbo.UpdateService @ServiceID, @ServiceDate, @TechName, @LaborCost, @PartsCost, @CarID", service) as List<int>;
+
+                if (results[0] >= 0 && service.ServiceID <= 0)
+                    service.ServiceID = results[0];
+
+                if (service.ServiceID == 0) //deleted, nothing left to do
+                    return true;
+
+                List<ServiceLineModel> SL = service.ServiceLineList;
+                if (SL.Count > 255)
+                    throw new Exception("Too many detail lines!");
+                else
                 {
-                    List<int> results;
-                    results = connection.Query<int>("dbo.UpdateService @ServiceID, @ServiceDate, @TechName, @LaborCost, @PartsCost, @CarID", service) as List<int>;
-
-                    if (results[0] >= 0 && service.ServiceID <= 0)
-                        service.ServiceID = results[0];
-
-                    if (service.ServiceID == 0) //deleted, nothing left to do
-                        return true;
-
-                    List<ServiceLineModel> SL = service.ServiceLineList;
-                    if (SL.Count > 255)
-                        throw new Exception("Too many detail lines!");
-                    else
+                    byte b = 0;
+                    foreach (IServiceLineModel s in SL)
                     {
-                        byte b = 0;
-                        foreach (IServiceLineModel s in SL)
-                        {
-                            s.ServiceLineOrder = b++; //save the order
-                            s.ServiceID = service.ServiceID;
-                        }
-                        // stored procedure deletes all lines before inserting new ones
-                        connection.Execute($"dbo.UpdateServiceLine @ServiceID, @ServiceLineOrder, @ServiceLineType, @ServiceLineDesc, @ServiceLineCharge", SL);
+                        s.ServiceLineOrder = b++; //save the order
+                        s.ServiceID = service.ServiceID;
                     }
+                    // stored procedure deletes all lines before inserting new ones
+                    connection.Execute($"dbo.UpdateServiceLine @ServiceID, @ServiceLineOrder, @ServiceLineType, @ServiceLineDesc, @ServiceLineCharge", SL);
                 }
-            }
-            catch (Exception e)
-            {
-                _handleError(e.Message);
-                return false;
             }
             return true;
         }
 
         public static bool DeleteCar(int id)
         {
-            try
+            using (IDbConnection connection = GetJoesDBConnection())
             {
-                using (IDbConnection connection = GetJoesDBConnection())
-                {
-                    connection.Execute($"dbo.DeleteCar @CarID={id}");
-                    return true;
-                }
-            }
-            catch (Exception e)
-            {
-                _handleError(e.Message);
-                return false;
+                connection.Execute($"dbo.DeleteCar @CarID={id}");
+                return true;
             }
         }
 
         public static bool DeleteService(int id)
         {
-            try
+            using (IDbConnection connection = GetJoesDBConnection())
             {
-                using (IDbConnection connection = GetJoesDBConnection())
-                {
-                    connection.Execute($"dbo.DeleteService @ServiceID={id}");
-                    return true;
-                }
-            }
-            catch (Exception e)
-            {
-                _handleError(e.Message);
-                return false;
+                connection.Execute($"dbo.DeleteService @ServiceID={id}");
+                return true;
             }
         }
-//reports
+        //reports
 
         public static string GetXSLTSheet(int id)
         {
-            try
+            using (IDbConnection connection = GetJoesDBConnection())
             {
-                using (IDbConnection connection = GetJoesDBConnection())
-                {
-                    List<string> results;
-                    results = connection.Query<string>($"SelectXSLTSheet @id={id}") as List<string>;
-                    return XMLHeader + results[0]; 
-                }
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException is null)
-                    _handleError(e.Message);
-                else
-                    _handleError(e.InnerException.Message);
-                return null;
+                List<string> results;
+                results = connection.Query<string>($"SelectXSLTSheet @id={id}") as List<string>;
+                return XMLHeader + results[0];
             }
 
         }
 
         public static string GetCarsXML()
         {
-            try
+            using (IDbConnection connection = GetJoesDBConnection())
             {
-                using (IDbConnection connection = GetJoesDBConnection())
-                {
-                    List<string> results;
-                    results = connection.Query<string>("SelectCarsXml") as List<string>;
-                    return XMLHeader + results[0];
-                }
-            }
-            catch (Exception e)
-            {
-                if (e.InnerException is null)
-                    _handleError(e.Message);
-                else
-                    _handleError(e.InnerException.Message);
-                return null;
+                List<string> results;
+                results = connection.Query<string>("SelectCarsXml") as List<string>;
+                return XMLHeader + results[0];
             }
         }
 

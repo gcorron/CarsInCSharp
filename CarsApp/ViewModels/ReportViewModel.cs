@@ -15,20 +15,28 @@ namespace Corron.Cars.ViewModels
     class ReportViewModel : Screen
     {
 
-        public delegate void ScreenStateChanged(bool canChangeScreen);
-        private ScreenStateChanged _screenStateChanged;
+        private ShellViewModel.ScreenStateChanged _screenStateChanged;
+        private ShellViewModel.ErrorHandler _notifyError;
 
         public string HtmlToDisplay{get; set;}
         public string XmlBox { get; set; }
 
-        public ReportViewModel(ScreenStateChanged screenStateChanged)
+        public ReportViewModel(ShellViewModel.ScreenStateChanged screenStateChanged,ShellViewModel.ErrorHandler notifyError)
         {
             _screenStateChanged = screenStateChanged;
+            _notifyError = notifyError;
         }
 
         public void CarsReport()
         {
-            HtmlToDisplay = TransformXML(DataAccess.GetCarsXML(),1); //TODO replace with constant or enum
+            try
+            {
+                HtmlToDisplay = TransformXML(DataAccess.GetCarsXML(), 1); //TODO replace with constant or enum
+            }
+            catch (Exception e)
+            {
+                _notifyError(e);
+            }
             NotifyOfPropertyChange(() => HtmlToDisplay);
         }
 
@@ -42,13 +50,22 @@ namespace Corron.Cars.ViewModels
             XslCompiledTransform xslt = new XslCompiledTransform();
 
             //prepare the stylesheet
-            string xsltString = DataAccess.GetXSLTSheet(xsltSheetId);
-            if (String.IsNullOrEmpty(xsltString))
-                return null;
 
-            using (XmlReader xr = XmlReader.Create(new StringReader(xsltString)))
+
+            try
             {
-                xslt.Load(xr);
+                string xsltString = DataAccess.GetXSLTSheet(xsltSheetId);
+                if (String.IsNullOrEmpty(xsltString))
+                    return null;
+
+                using (XmlReader xr = XmlReader.Create(new StringReader(xsltString)))
+                {
+                    xslt.Load(xr);
+                }
+            }
+            catch (Exception e)
+            {
+                _notifyError(e);
             }
 
             //prepare the XML

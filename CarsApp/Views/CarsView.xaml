@@ -46,9 +46,9 @@
             
             <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0">
                 <Label Content="Car" HorizontalAlignment="Center"/>
-                <Button x:Name="Edit" Content="Edit" Margin="5"/>
+                <Button x:Name="Edit" Content="Edit" Margin="5" IsEnabled="{Binding Path=CarSelected}"/>
                 <Button x:Name="Add" Content="Add" Margin="5"/>
-                <Button x:Name="Delete" Content="Delete" Margin="5"/>
+                <Button x:Name="Delete" Content="Delete" Margin="5"  IsEnabled="{Binding Path=CarSelected}"/>
             </StackPanel>
         </Grid>
         <!-- Right Side -->

@@ -12,22 +12,17 @@ namespace Corron.Cars
 {
     public static class DataAccess
     {
-       // public delegate void HandleError(string Message);
-
         private static bool _useSQL;
 
-        public static string Initialize(SQLData.HandleError handleError)
+        public static string Initialize()
         {
             string webAddress = Corron.CarService.SQLData.WebConnection();
             _useSQL = String.IsNullOrEmpty(webAddress);
             if (_useSQL)
-            {
-                SQLData.Initialize(handleError);
                 return "Connected via SQL";
-                }
             else
         	{
-                WebClient.Initialize(handleError, webAddress);
+                WebClient.Initialize(webAddress);
                 return "Connected via Web";
             }
         }

@@ -26,13 +26,13 @@ namespace Corron.Cars.ViewModels
         private ICarModel _car;
         private int _listBookMark;
 
-        public delegate void ScreenStateChanged(bool canChangeScreen);
-        private ScreenStateChanged _screenStateChanged;
+        private ShellViewModel.ScreenStateChanged _screenStateChanged;
+        private ShellViewModel.ErrorHandler _notifyError;
 
-
-        public ServicesViewModel(ScreenStateChanged screenStateChanged)
+        public ServicesViewModel(ShellViewModel.ScreenStateChanged screenStateChanged, ShellViewModel.ErrorHandler notifyError)
         {
             _screenStateChanged = screenStateChanged;
+            _notifyError = notifyError;
         }
 
         //Load Data, always call on activation!
@@ -42,9 +42,16 @@ namespace Corron.Cars.ViewModels
 
             _car = car;
 
-            _serviceList = DataAccess.GetServices(car.CarID); // load up Services from DB
-            if (_serviceList is null)
-                return false;
+            try
+            {
+                _serviceList = DataAccess.GetServices(car.CarID); // load up Services from DB
+                if (_serviceList is null)
+                    return false;
+            }
+            catch (Exception e)
+            {
+                _notifyError(e);
+            }
 
             foreach(ServiceModel SM in _serviceList)
             {
@@ -64,8 +71,6 @@ namespace Corron.Cars.ViewModels
 
             NotifyOfPropertyChange(() => SortedServices);
             NotifyOfPropertyChange(() => CanDelete);
-           // NotifyOfPropertyChange(() => FieldedService);
-           // NotifyOfPropertyChange(() => ServiceLines);
             return true;
         }
 
@@ -170,11 +175,18 @@ namespace Corron.Cars.ViewModels
             if (MessageBox.Show("Do you want to Delete this service?", "Confirm",
                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (DataAccess.DeleteService(_fieldedService.ServiceID))
+                try
                 {
-                    SortedServices.Remove(_fieldedService);
-                    SortedServices.Refresh();
-                    NotifyOfPropertyChange(() => CanDelete);
+                    if (DataAccess.DeleteService(_fieldedService.ServiceID))
+                    {
+                        SortedServices.Remove(_fieldedService);
+                        SortedServices.Refresh();
+                        NotifyOfPropertyChange(() => CanDelete);
+                    }
+                }
+                catch (Exception e)
+                {
+                    _notifyError(e);
                 }
             }
         }
@@ -192,8 +204,15 @@ namespace Corron.Cars.ViewModels
             _fieldedService.ServiceLineList.RemoveAll(SL => SL.Delete);
 
 
-            if (!DataAccess.UpdateService(_fieldedService))
-                return;
+            try
+            {
+                if (!DataAccess.UpdateService(_fieldedService))
+                    return;
+            }
+            catch (Exception e)
+            {
+                _notifyError(e);
+            }
 
             if (isnew)
             {

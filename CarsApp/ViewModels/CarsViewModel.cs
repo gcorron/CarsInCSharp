@@ -19,21 +19,27 @@ namespace Corron.Cars.ViewModels
     {
         private List<CarModel> _carList;
 
-        public delegate void SelectedCarChanged(ICarModel CarModel);
-        public delegate void ScreenStateChanged(bool CanChangeScreen);
-        private SelectedCarChanged _notifyCarChanged;
-        private ScreenStateChanged _notifySSChanged;
+        private ShellViewModel.SelectedCarChanged _notifyCarChanged;
+        private ShellViewModel.ScreenStateChanged _notifySSChanged;
+        private ShellViewModel.ErrorHandler _notifyError;
 
-        public CarsViewModel(SelectedCarChanged notifyCarChanged, ScreenStateChanged notifySSChanged)
+        public CarsViewModel(ShellViewModel.SelectedCarChanged notifyCarChanged, ShellViewModel.ScreenStateChanged notifySSChanged,ShellViewModel.ErrorHandler notifyError)
         {
             _notifyCarChanged = notifyCarChanged;
             _notifySSChanged = notifySSChanged;
+            _notifyError = notifyError;
 
             BindingList<CarModel> _cars;
-            _carList = DataAccess.GetCars();
-            if (_carList is null)
+
+            try
+            {
+                _carList = DataAccess.GetCars();
+            }
+            catch (Exception e)
+            {
+                notifyError(e);
                 return;
-            Debug.Assert(_carList[0].CarID != 0); //bad data
+            }
 
             _carList.Sort();
 
@@ -52,13 +58,16 @@ namespace Corron.Cars.ViewModels
             set
             {
                 _fieldedCar = value;
-                NotifyOfPropertyChange(() => FieldedCar);
+                NotifyOfPropertyChange();
+                NotifyOfPropertyChange(() => CarSelected);
                 _notifyCarChanged(FieldedCar);
             }
         }
         private ICarModel _fieldedCar;
 
         private ICarModel LastFieldedCar { get; set; }
+
+        public bool CarSelected => !(FieldedCar is null);
 
         public bool CanSave(string Fieldedcar_Make, string Fieldedcar_Model, string Fieldedcar_Owner, int Fieldedcar_Year)
         {
@@ -111,12 +120,9 @@ namespace Corron.Cars.ViewModels
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(
-                        $"Database Error: {e.Message}");
-                    return;                
+                    _notifyError(e);
                 }
             }
-
         }
 
         public bool CanDelete(bool FieldedCar_HasService)
@@ -136,7 +142,15 @@ namespace Corron.Cars.ViewModels
 
             bool isnew = _fieldedCar.CarID == 0;
 
-            DataAccess.UpdateCar(_fieldedCar as CarModel);
+            try
+            {
+                DataAccess.UpdateCar(_fieldedCar as CarModel);
+            }
+            catch (Exception e)
+            {
+                _notifyError(e);
+            }
+
             if (isnew)
             { 
                 SortedCars.CommitNew();
@@ -168,7 +182,14 @@ namespace Corron.Cars.ViewModels
 
         public void Report()
         {
-            DataAccess.GetCarsXML();
+            try
+            {
+                DataAccess.GetCarsXML();
+            }
+            catch (Exception e)
+            {
+                _notifyError(e);
+            }
         }
     }
 }
