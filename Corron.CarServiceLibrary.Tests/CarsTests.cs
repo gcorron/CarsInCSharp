@@ -10,6 +10,13 @@ namespace Corron.CarServiceLibrary.Tests
 {
     public class CarsTests
     {
+        [Fact]
+        public void DeleteServiceShouldThrow()
+        {
+            int id = 99999;
+            var ex=Assert.ThrowsAny<Exception>(()=>SQLData.DeleteService(id));
+            Assert.IsNotType<NullReferenceException>(ex);
+        }
 
         [Theory]
         [InlineData("RuWork",Validation.NNV,0)]
@@ -19,14 +26,12 @@ namespace Corron.CarServiceLibrary.Tests
         [InlineData("-5.00", Validation.AMNBN, 0)]
         [InlineData("", Validation.FMNBB, 0)]
 
-
         public void CostStringShouldValidate(string sval, string sresult, decimal dresult)
         {
             //Arrange
  
             //Act
-            decimal dactual;
-            string sactual = Validation.ValidateCostString(sval, out dactual);
+            string sactual = Validation.ValidateCostString(sval, out decimal dactual);
 
             //Assert
             Assert.Equal(sresult, sactual);

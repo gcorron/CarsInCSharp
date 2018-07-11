@@ -51,8 +51,7 @@ namespace Corron.CarService
                     connection.Query<ServiceModel, ServiceLineModel, ServiceModel>
                         ($"SelectServicesForCar @CarID", (S, L) =>
                         {
-                            ServiceModel SM;
-                            if (!lookup.TryGetValue(S.ServiceID, out SM))
+                            if (!lookup.TryGetValue(S.ServiceID, out ServiceModel SM))
                             {
                                 lookup.Add(S.ServiceID, SM = S);
                             }

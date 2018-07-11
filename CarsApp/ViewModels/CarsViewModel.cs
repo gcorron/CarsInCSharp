@@ -36,6 +36,7 @@ namespace Corron.Cars.ViewModels
             Debug.Assert(_carList[0].CarID != 0); //bad data
 
             _carList.Sort();
+
             _cars = new BindingList<CarModel>(_carList); // load up cars from DB
             _cars.RaiseListChangedEvents = true;
             SortedCars =  new BindingListCollectionView(_cars);
@@ -162,9 +163,7 @@ namespace Corron.Cars.ViewModels
             { 
                 SortedCars.CancelEdit();
             }
-
             ScreenEditingMode = false;
-
          }
 
         public void Report()

@@ -24,12 +24,5 @@ namespace Corron.Cars.Views
         {
             InitializeComponent();
         }
-        public void ChangeScreenState(char screenState)
-        {
-            if (screenState=='E')
-            {
-                
-            }
-        }
     }
 }

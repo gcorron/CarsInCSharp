@@ -37,7 +37,7 @@
             <ListView  x:Name="SortedCars" SelectedItem="{Binding Path=FieldedCar, Mode=TwoWay}" FontSize="12" Margin="5">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Date" Width="50" DisplayMemberBinding="{Binding Year}"/>
+                        <GridViewColumn Header="Year" Width="50" DisplayMemberBinding="{Binding Year}"/>
                         <GridViewColumn Header="Make" Width="95" DisplayMemberBinding="{Binding Make}"/>
                         <GridViewColumn Width="95" Header="Model" DisplayMemberBinding="{Binding Model}"/>
                     </GridView>
@@ -49,8 +49,6 @@
                 <Button x:Name="Edit" Content="Edit" Margin="5"/>
                 <Button x:Name="Add" Content="Add" Margin="5"/>
                 <Button x:Name="Delete" Content="Delete" Margin="5"/>
-                <Label Content="Cars" HorizontalAlignment="Center"/>
-                <Button x:Name="Report" Content="Report" Margin="5"/>
             </StackPanel>
         </Grid>
         <!-- Right Side -->
