@@ -77,5 +77,9 @@
     <Build Include="dbo\Stored Procedures\SelectCarsXml.sql" />
     <Build Include="dbo\Tables\XSLTSheets.sql" />
     <Build Include="dbo\Stored Procedures\SelectXsltSheet.sql" />
+    <Build Include="dbo\Stored Procedures\SelectService.sql" />
+    <Build Include="dbo\Stored Procedures\SelectSearchOwners.sql" />
+    <Build Include="dbo\Stored Procedures\SelectCarsFiltered.sql" />
+    <Build Include="dbo\Stored Procedures\SelectCar.sql" />
   </ItemGroup>
 </Project>

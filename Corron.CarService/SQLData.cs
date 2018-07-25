@@ -5,7 +5,7 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using Dapper;
-using System.Xml;
+using System.Transactions;
 
 namespace Corron.CarService
 {
@@ -19,6 +19,34 @@ namespace Corron.CarService
             {
                 return connection.Query<CarModel>("SelectCars").ToList<CarModel>();
             }
+        }
+
+        public static List<CarModel> GetCarsFiltered(int year, string owner)
+        {
+            using (IDbConnection connection = GetJoesDBConnection())
+            {
+                return connection.Query<CarModel>($"SelectCarsFiltered @year={ year }, @owner= '{owner}'").ToList<CarModel>();
+            }
+        }
+
+        public static CarModel GetCar(int CarID)
+        {
+            using (IDbConnection connection = GetJoesDBConnection())
+            {
+                var carlist= connection.Query<CarModel>($"SelectCar @CarID={CarID}").ToList<CarModel>();
+                if (carlist.Count != 1)
+                    throw new RowNotInTableException();
+                return carlist[0];
+            }
+        }
+
+        public static string[] SearchOwners(string search)
+        {
+            using (IDbConnection connection = GetJoesDBConnection())
+            {
+                return connection.Query<string>($"SelectSearchOwners @search='{ search }'").ToArray<string>();
+            }
+
         }
 
         public static List<ServiceModel> GetServices(int CarID)
@@ -42,6 +70,27 @@ namespace Corron.CarService
             return lookup.Values.ToList<ServiceModel>();
         }
 
+        public static ServiceModel GetService(int ServiceID)
+        {
+            var lookup = new Dictionary<int, ServiceModel>();
+            using (IDbConnection connection = GetJoesDBConnection())
+            {
+                connection.Query<ServiceModel, ServiceLineModel, ServiceModel>
+                    ($"SelectService @ServiceID", (S, L) =>
+                    {
+                        if (!lookup.TryGetValue(S.ServiceID, out ServiceModel SM))
+                        {
+                            lookup.Add(S.ServiceID, SM = S);
+                        }
+
+                        SM.ServiceLineList.Add(L);
+                        return SM;
+
+                    }, new { ServiceID }, splitOn: "ServiceID");
+            }
+            return lookup.Values.First();
+        }
+
         public static bool UpdateCar(CarModel car)
         {
             using (IDbConnection connection = GetJoesDBConnection())
@@ -58,33 +107,48 @@ namespace Corron.CarService
 
         public static bool UpdateService(ServiceModel service)
         {
-            using (IDbConnection connection = GetJoesDBConnection())
+            using (TransactionScope scope = new TransactionScope())
             {
-                List<int> results;
-                results = connection.Query<int>("dbo.UpdateService @ServiceID, @ServiceDate, @TechName, @LaborCost, @PartsCost, @CarID", service) as List<int>;
-
-                if (results[0] >= 0 && service.ServiceID <= 0)
-                    service.ServiceID = results[0];
-
-                if (service.ServiceID == 0) //deleted, nothing left to do
-                    return true;
-
-                List<ServiceLineModel> SL = service.ServiceLineList;
-                if (SL.Count > 255)
-                    throw new Exception("Too many detail lines!");
-                else
+                try
                 {
-                    byte b = 0;
-                    foreach (IServiceLineModel s in SL)
+                    using (IDbConnection connection = GetJoesDBConnection())
                     {
-                        s.ServiceLineOrder = b++; //save the order
-                        s.ServiceID = service.ServiceID;
+                        List<int> results;
+
+                        results = connection.Query<int>("dbo.UpdateService @ServiceID, @ServiceDate, @TechName, @LaborCost, @PartsCost, @CarID", service) as List<int>;
+
+                        if (results[0] >= 0 && service.ServiceID <= 0)
+                            service.ServiceID = results[0];
+
+                        if (service.ServiceID != 0) //zero if deleted, nothing left to do
+                        {
+                            List<ServiceLineModel> SL = service.ServiceLineList;
+                            if (SL.Count > 255)
+                                throw new Exception("Too many detail lines!");
+                            else if (SL.Count == 0)
+                                throw new Exception("At least one detail line is required!");
+                            else
+                            {
+                                byte b = 0;
+                                foreach (IServiceLineModel s in SL)
+                                {
+                                    s.ServiceLineOrder = b++; //save the order
+                                    s.ServiceID = service.ServiceID;
+                                }
+                                // stored procedure deletes all lines before inserting new ones
+                                connection.Execute($"dbo.UpdateServiceLine @ServiceID, @ServiceLineOrder, @ServiceLineType, @ServiceLineDesc, @ServiceLineCharge", SL);
+                            }
+                        }
+                        scope.Complete();
                     }
-                    // stored procedure deletes all lines before inserting new ones
-                    connection.Execute($"dbo.UpdateServiceLine @ServiceID, @ServiceLineOrder, @ServiceLineType, @ServiceLineDesc, @ServiceLineCharge", SL);
+                    return true;
                 }
+                catch (TransactionAbortedException ex)
+                {
+                    // there will be other exceptions too, so ignore this one.
+                }
+                return false;
             }
-            return true;
         }
 
         public static bool DeleteCar(int id)

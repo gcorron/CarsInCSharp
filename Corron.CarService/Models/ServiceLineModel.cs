@@ -125,7 +125,8 @@ namespace Corron.CarService
             {
                 _delete = value;
                 DoRecalc();
-                ValidChangedAction();
+                if (!(ValidChangedAction is null))
+                    ValidChangedAction();
             }
         }
         private bool _delete;
