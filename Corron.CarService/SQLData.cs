@@ -145,7 +145,7 @@ namespace Corron.CarService
                 }
                 catch (TransactionAbortedException ex)
                 {
-                    // there will be other exceptions too, so ignore this one.
+                    // there will be other exceptions too, so do not rethrow.
                 }
                 return false;
             }

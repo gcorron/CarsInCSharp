@@ -19,7 +19,7 @@ namespace Corron.CarServiceLibrary.Tests
         }
 
         [Theory]
-        [InlineData("RuWork",Validation.NNV,0)]
+        [InlineData("RuWork", Validation.NNV,0)]
         [InlineData("42.2", Validation.ICA, 0)]
         [InlineData("20.00", Validation.OK, 20)]
         [InlineData("0", Validation.MD, 0)]

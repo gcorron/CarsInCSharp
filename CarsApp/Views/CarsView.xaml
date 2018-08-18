@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Background="Aqua"
+             mc:Ignorable="d" Background="#FF0F8B8B"
              FontSize="16" Width="Auto" Height="Auto" 
              d:DesignHeight="400" d:DesignWidth="800">
     <UserControl.Resources>
@@ -34,7 +34,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <ListView  x:Name="SortedCars" SelectedItem="{Binding Path=FieldedCar, Mode=TwoWay}" FontSize="12" Margin="5">
+            <ListView  x:Name="SortedCars" SelectedItem="{Binding Path=FieldedCar, Mode=TwoWay}" FontSize="12" Margin="5" Background="#FFE6CACA">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Year" Width="50" DisplayMemberBinding="{Binding Year}"/>

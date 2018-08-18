@@ -20,7 +20,6 @@ namespace CarsAPI
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            SQLData.Initialize(MyHandleError);
         }
 
         private void MyHandleError(string Message)

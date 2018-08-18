@@ -12,19 +12,17 @@ namespace Corron.Cars
 {
     public static class DataAccess
     {
+
         private static bool _useSQL;
 
-        public static string Initialize()
+        public static bool Initialize()
         {
             string webAddress = Corron.CarService.SQLData.WebConnection();
             _useSQL = String.IsNullOrEmpty(webAddress);
-            if (_useSQL)
-                return "Connected via SQL";
-            else
-        	{
+            if (!_useSQL)
                 WebClient.Initialize(webAddress);
-                return "Connected via Web";
-            }
+
+            return _useSQL;
         }
 
         public static List<CarModel> GetCars()

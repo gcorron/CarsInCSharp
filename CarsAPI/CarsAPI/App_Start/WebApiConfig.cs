@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.ExceptionHandling;
 
 namespace CarsAPI
 {
@@ -10,6 +13,7 @@ namespace CarsAPI
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
+
 
             // Web API routes
             config.MapHttpAttributeRoutes();
@@ -21,4 +25,5 @@ namespace CarsAPI
             );
         }
     }
+
 }

@@ -26,7 +26,7 @@ namespace Corron.Cars
                 _client.DefaultRequestHeaders.Accept.Clear();
                 _client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/json"));
-                _client.Timeout = System.TimeSpan.FromSeconds(5);
+                _client.Timeout = System.TimeSpan.FromSeconds(15); //timeout 15 seconds
             }
         }
 
@@ -223,14 +223,28 @@ namespace Corron.Cars
         
         private static void ThrowSQLError(HttpResponseMessage response, string operation)
         {
-            string details = GetErrorDetailsFromResponse(response).GetAwaiter().GetResult();
-            throw new Exception($"{operation} failed because: {response.ReasonPhrase}: {response.Content}");
+            CustomException myException;
+            try
+            {
+                myException = GetErrorDetailsFromResponse(response).GetAwaiter().GetResult();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"{operation} failed: internal server error");
+            }
+            throw new Exception($"Server error: {myException.ExceptionMessage}");
         }
 
-        private static async Task<string> GetErrorDetailsFromResponse(HttpResponseMessage response)
+        private static async Task<CustomException> GetErrorDetailsFromResponse(HttpResponseMessage response)
         {
-            return await response.Content.ReadAsAsync<string>().ConfigureAwait(false);
+            return await response.Content.ReadAsAsync<CustomException>().ConfigureAwait(false);
         }
 
+    }
+    public class CustomException
+    {
+        public string Message { get; set; }
+        public string ExceptionMessage { get; set; }
+        public string MessageType { get; set; }
     }
 }

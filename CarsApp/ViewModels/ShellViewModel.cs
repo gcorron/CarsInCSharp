@@ -31,11 +31,13 @@ namespace Corron.Cars.ViewModels
         public delegate void ErrorHandler(Exception e);
         public delegate void SelectedCarChanged(ICarModel CarModel);
         public delegate void ScreenStateChanged(bool CanChangeScreen);
+        private enum ConnMethod { SQL, Web};
+        private ConnMethod _connectionMethod;
 
         //Constructor
         public ShellViewModel()
         {
-            ConnectMethod=DataAccess.Initialize();
+            _connectionMethod=DataAccess.Initialize() ? ConnMethod.SQL:ConnMethod.Web;
             CarsScreen = true;
             CanChangeScreen = false;
             _waitingForCar = true;
@@ -64,7 +66,20 @@ namespace Corron.Cars.ViewModels
 
      //Properties
 
-        public string ConnectMethod { get; set; }
+        public string ConnectMethod
+        {
+            get
+            {
+                switch (_connectionMethod)
+                { 
+                    case ConnMethod.SQL:
+                        return "Connected via SQL";
+                case ConnMethod.Web:
+                        return "Connected via Web";
+                }
+                return "Not a valid connection method!";
+            }
+        }
 
         public bool CarsScreen
         {
@@ -173,7 +188,10 @@ namespace Corron.Cars.ViewModels
             if (e is null)
                 ErrorMessage = "";
             else
-                ErrorMessage=e.Message;
+                if (_connectionMethod == ConnMethod.Web && e.HResult == -2146233029) //a task was cancelled -- timeout
+                ErrorMessage = "No response from server.";
+            else
+                ErrorMessage = e.Message;
 
             CurrentException = e;
             NotifyOfPropertyChange(() => ErrorMessage);
